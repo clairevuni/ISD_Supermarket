@@ -1,2 +1,3 @@
-# ISD_Hotel
-ISD per prenotazione pagine Hotel
+# ISD_Supermarket
+ISD per prenotazione pagine di Supermercati
+
