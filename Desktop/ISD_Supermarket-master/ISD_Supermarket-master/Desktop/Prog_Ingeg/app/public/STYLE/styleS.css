@@ -9,7 +9,8 @@ body {
 
 h2 {
   text-align: center;
-  color: #333;
+  color: #3498db;
+  margin-bottom: 20px;
 }
 
 form {
@@ -28,33 +29,37 @@ label {
 }
 
 input {
-  width: 100%;
+  width: calc(100% - 20px);
   padding: 10px;
   margin-bottom: 16px;
-  border: 1px solid #ccc;
+  border: 1px solid #3498db;
   border-radius: 4px;
 }
 
 button {
-  background-color: #4caf50;
+  background-color: #2ecc71;
   color: #fff;
   padding: 12px 20px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+  display: inline-block;
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #27ae60;
 }
 
 p {
   text-align: center;
   margin-top: 16px;
+  color: #333;
 }
 
 a {
-  color: #4caf50;
+  color: #3498db;
   text-decoration: none;
 }
 
@@ -62,10 +67,7 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Optional: Add some responsive styles */
-
-@media screen and (max-width: 600px) {
-  form {
-    max-width: 100%;
-  }
+.icon {
+  margin-right: 8px;
+  font-size: 18px;
 }
