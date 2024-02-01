@@ -62,7 +62,7 @@ app.post('/login', (req, res) => {
       if (response.status === 200) {
         // Ottenere l'URL di reindirizzamento dal microservizio degli utenti
         const redirectUrl = response.data.redirect;        
-        res.redirect(redirectUrl);
+        res.redirect(`${redirectUrl}?username=${username}`);
       }
     })
     .catch(error => {
@@ -186,7 +186,7 @@ app.post('/login-supermarket', (req, res) => {
       if (response.status === 200) {
         // Ottenere l'URL di reindirizzamento dal microservizio degli utenti
         const redirectUrl = response.data.redirect;        
-        res.redirect(redirectUrl);
+         res.redirect(`${redirectUrl}?username=${username}`);
       }
     })
     .catch(error => {
@@ -255,8 +255,9 @@ app.get('/supermercatoS', (req, res) => {
 
 
 app.get('/supermarket-welcome', (req, res) => {
+  const username = req.query.username;
   // You can call the Supermarkets microservice supermercato endpoint through the API Gateway
-  axios.get('http://localhost:4000/supermarkets/supermarket-welcome')
+  axios.get(`http://localhost:4000/supermarkets/supermarket-welcome?username=${username}`)
     .then(response => {
       res.status(response.status).send(response.data);
     })
@@ -265,6 +266,7 @@ app.get('/supermarket-welcome', (req, res) => {
       res.status(500).send('Internal Server Error');
     });
 });
+
 
 //Products Routes
 

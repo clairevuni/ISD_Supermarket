@@ -121,7 +121,7 @@ router.post('/login-supermarket', (req, res) => {
       if (bcryptResult) {
         // Successful login
         const redirectUrl = '/supermarket-welcome'; // Indica la pagina di benvenuto
-        res.status(200).json({ message: 'Login successful', redirect: redirectUrl });
+        res.status(200).json({ message: 'Login successful', redirect: redirectUrl, username: username });
       } else {
         res.status(401).send('Authentication Failed');
       }
@@ -139,12 +139,13 @@ router.get('/supermarket-welcome', (req, res) => {
       return res.status(500).send('Internal Server Error');
     }
 
-    const welcomeMessage = `Welcome, ${username || 'Supermarket'}!`;
-    const renderedHTML = data.replace('<!--#welcome-message-->', welcomeMessage);
+  const welcomeMessage = `Welcome, ${username || 'Supermarket'}!`;
+const renderedHTML = data.replace('<!--#welcome-message-->', welcomeMessage);
 
-    const userWelcomeMessage = username ? `Welcome, ${username}! What we are doing today?` : 'Welcome, Supermarket!';
-    const userRenderedHTML = renderedHTML.replace('<!--#welcome-user-->', userWelcomeMessage);
-    res.status(200).send(userRenderedHTML);
+const userWelcomeMessage = username ? `Welcome, ${username}! What we are doing today?` : 'Welcome, Supermarket!';
+const userRenderedHTML = renderedHTML.replace('<!--#welcome-user-->', userWelcomeMessage);
+
+res.status(200).send(userRenderedHTML);
   });
 });
 

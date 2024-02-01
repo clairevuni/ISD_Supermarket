@@ -75,7 +75,7 @@ router.post('/login', (req, res) => {
       if (bcryptResult) {
         // Successful login
         const redirectUrl = '/welcome'; // Indica la pagina di benvenuto
-        res.status(200).json({ message: 'Login successful', redirect: redirectUrl });
+        res.status(200).json({ message: 'Login successful', redirect: redirectUrl, username: username });
       } else {
         res.status(401).send('Authentication Failed');
       }
