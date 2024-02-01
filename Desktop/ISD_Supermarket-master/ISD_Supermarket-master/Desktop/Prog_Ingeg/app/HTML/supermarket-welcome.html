@@ -9,92 +9,136 @@
   <style>
     /* style.css */
 
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
+      body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
 
-    .container {
-      max-width: 600px;
-      margin: 50px auto;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
+      .container {
+        max-width: 600px;
+        margin: 50px auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
 
-    form {
-      display: grid;
-      gap: 10px;
-    }
+      form {
+        display: grid;
+        gap: 10px;
+      }
 
-    label {
-      font-weight: bold;
-    }
+      label {
+        font-weight: bold;
+      }
 
-    input,
-    textarea {
-      width: 100%;
-      padding: 8px;
-      box-sizing: border-box;
-    }
+      input,
+      textarea {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+      }
 
-    button {
-      background-color: #4caf50;
-      color: #fff;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+      button {
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
 
-    button:hover {
-      background-color: #45a049;
-    }
+      button:hover {
+        background-color: #45a049;
+      }
 
-    a {
-      color: #4caf50;
-      text-decoration: none;
-    }
+      a {
+        color: #4caf50;
+        text-decoration: none;
+      }
 
-    a:hover {
-      text-decoration: underline;
-    }
+      a:hover {
+        text-decoration: underline;
+      }
 
-    .modal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
+      /* style.css */
+
+/* ... (resto del tuo codice) */
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px; /* Larghezza iniziale della modal */
+        max-width: calc(100% - 40px); /* Imposta la larghezza massima in base alla grandezza dello schermo */
+        max-height: calc(50% - 40px); /* Imposta l'altezza massima in base alla grandezza dello schermo */
+        overflow-y: auto; /* Aggiunge la scrollbar verticale quando necessario */
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        box-sizing: border-box; /* Risolve il problema del padding che fa fuoriuscire la modal */
+      }
+
+      .small-modal {
+        width: 300px; /* Larghezza della modal più piccola */
+      }
+
+      .modal-content {
+        max-height: calc(100% - 500px); /* Imposta l'altezza massima del contenuto interno */
+      }
+
+      .close-icon {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+        font-size: 20px; /* Imposta la dimensione dell'icona "x" */
+      }
+
+
+      #welcomeTitle {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      #actionButtons {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+      }
+
+
   </style>
 </head>
 
 <body>
-  <button id="openModalButton">Apri Modal</button>
+  <div class="container">
+    <h2 id="welcomeTitle">Benvenuto nella tua pagina dedicata, cosa vuoi fare oggi?</h2>
 
-  <div class="modal" id="myModal">
-    <form action="/save-product" method="POST">
-      <label for="productName">Nome Prodotto:</label>
-      <input type="text" id="productName" name="productName">
-      <label for="productCategory">Categoria:</label>
-      <input type="text" id="productCategory" name="productCategory">
-      <label for="productPrice">Prezzo:</label>
-      <input type="text" id="productPrice" name="productPrice">
-      <label for="productDescription">Descrizione:</label>
-      <textarea id="productDescription" name="productDescription"></textarea>
-      <button id="saveProductButton">Salva Prodotto</button>
-    </form>
+    <div id="actionButtons">
+      <button id="openModalButton">Aggiungi Prodotti</button>
+      <a class="dropdown-item" href="/logout">Logout</a>
+    </div>
+
+    <div class="modal" id="myModal">
+      <form action="/save-product" method="POST">
+        <label for="productName">Nome Prodotto:</label>
+        <input type="text" id="productName" name="productName">
+        <label for="productCategory">Categoria:</label>
+        <input type="text" id="productCategory" name="productCategory">
+        <label for="productPrice">Prezzo:</label>
+        <input type="text" id="productPrice" name="productPrice">
+        <label for="productDescription">Descrizione:</label>
+        <textarea id="productDescription" name="productDescription"></textarea>
+        <button id="saveProductButton">Salva Prodotto</button>
+      </form>
+    </div>
   </div>
-
-  <a class="dropdown-item" href="/supermercato">Supermercato</a>
 
   <script src="modal.js"></script>
 </body>
