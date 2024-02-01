@@ -44,6 +44,8 @@ const router = express.Router();
   });
 });*/
 
+
+
 router.get('/login', (req, res) => {
   const filePath = path.join(__dirname, 'HTML', 'index.html');
   res.sendFile(filePath);
@@ -167,19 +169,6 @@ router.get('/supermercato', (req, res) => {
   res.sendFile(filePath);
 });
 
-
-router.get('/logout', (req, res) => {
-  // Esegui le azioni di logout necessarie (ad esempio, distruggi la sessione)
-  req.session.destroy(err => {
-    if (err) {
-      console.error(err);
-      return res.status(500).send('Internal Server Error');
-    }
-    res.redirect('/');
-    // Invia una risposta di logout riuscito
-    res.status(200).json({ message: 'Logout successful' });
-  });
-});
 
 
 module.exports = router;

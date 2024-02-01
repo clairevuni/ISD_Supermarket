@@ -87,16 +87,7 @@ app.get('/welcome', (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-  // Effettua la richiesta di logout al microservizio degli utenti
-  axios.get('http://localhost:4000/users/logout')
-    .then(response => {
-      // Reindirizza alla pagina del menu principale dopo il logout
-      res.redirect('/');
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).send('Internal Server Error: ${error.message}');
-    });
+res.redirect('/');
 });
 
 app.get('/menu', (req, res) => {
