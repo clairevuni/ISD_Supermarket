@@ -162,7 +162,6 @@ app.get('/supermercato', (req, res) => {
     });
 });
 
-
 /*
 // Supermarkets Microservice routes
 */
@@ -239,6 +238,22 @@ app.post('/register-supermarket', async (req, res) => {
   }
 });
 
+app.get('/supermercatoS', (req, res) => {
+  // You can call the Users microservice login endpoint through the API Gateway
+  
+  axios.get('http://localhost:4000/supermarkets/supermercatoS', {params: req.body})
+    .then(response => {
+      res.status(response.status).send(response.data);
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).send('Internal Server Error!!');
+    });
+});
+
+
+
+
 app.get('/supermarket-welcome', (req, res) => {
   // You can call the Supermarkets microservice supermercato endpoint through the API Gateway
   axios.get('http://localhost:4000/supermarkets/supermarket-welcome')
@@ -268,7 +283,7 @@ app.post('/save-product', async (req, res) => {
 
     // Verifica lo stato e gestisci la risposta
     if (response.status === 200) {
-      res.redirect('/supermercato'); // Reindirizza l'utente alla pagina di benvenuto del supermercato
+      res.redirect('/supermercatoS'); // Reindirizza l'utente alla pagina di benvenuto del supermercato
     } else {
       res.status(response.status).json(response.data);
     }

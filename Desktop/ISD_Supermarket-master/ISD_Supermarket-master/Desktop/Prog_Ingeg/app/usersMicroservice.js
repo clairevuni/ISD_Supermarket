@@ -170,5 +170,14 @@ router.get('/supermercato', (req, res) => {
 });
 
 
+router.get('/logout', (req, res) => {
+  try {
+    // Azioni di logout necessarie
+    res.redirect('/');
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error!!' });
+  }
+});
 
 module.exports = router;
