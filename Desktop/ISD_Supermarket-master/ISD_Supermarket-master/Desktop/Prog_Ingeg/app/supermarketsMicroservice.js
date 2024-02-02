@@ -164,6 +164,7 @@ const initProductsDb = () => {
 initProductsDb();
 
 router.get('/supermercatoS', (req, res) => {
+  const { username } = req.query;
   try {
     const filePath = path.join(__dirname, 'HTML', 'supermercatoS.html');
     res.sendFile(filePath);

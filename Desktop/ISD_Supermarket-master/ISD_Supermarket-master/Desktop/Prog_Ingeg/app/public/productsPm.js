@@ -39,8 +39,8 @@ function insertProducts(products, supermarketName) {
     addToCartButton.textContent = 'Aggiungi al Carrello';
 
     const supermarketNameElement = document.createElement('p');
-    supermarketNameElement.classList.add('supermarket-name');
-    supermarketNameElement.textContent = `Supermercato: ${supermarketName}`;
+    supermarketNameElement.classList.add('username');
+    supermarketNameElement.textContent = `Supermercato: ${username}`;
 
     // Aggiungi un gestore di eventi per il clic sul bottone
     addToCartButton.addEventListener('click', () => {
