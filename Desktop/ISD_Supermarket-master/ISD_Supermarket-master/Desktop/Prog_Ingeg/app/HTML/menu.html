@@ -1,77 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menu Page</title>
-  <link rel="stylesheet" type="text/css" href="/STYLE/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
-
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/STYLE/style.css">
+    <title>Web Page!</title>
 </head>
 <body>
 
-    <!-- Header ================================================== -->
-    <header id="home">
-      <nav id="nav-wrap">
-        <div class="logo">
-          <img src="/image/logo.png" alt="Logo">
-        </div>
-        <ul class="menu">
-          <li class="current"><a class="smoothscroll" href="#home">Home</a></li>
-          <li><a class="smoothscroll" href="#about">About</a></li>
-          <li><a class="smoothscroll" href="#contact">Contact</a></li>
-        </ul>
-        <div class="dropdown">
-          <i class="fas fa-lock dropbtn"></i>
-          <div class="dropdown-content">
-            <a href="/login">Login</a>
-            <a href="/login-supermarket">Supermarket Login</a>
-          </div>
-        </div>
-              
-      </nav>
-    </header>
 
-  <section id="home">
-    <h2>Home Section</h2>
-    <div id="advertisement">
-      <img src="/image/fruitday.png" alt="Prima Immagine">
-      <div>
-        <img src="/image/image2.webp" alt="Seconda Immagine">
-        <img src="/image/image3.png" alt="Terza Immagine">
-      </div>
-    </div>
-  </section>
+      <header>
+        <nav>
+            <ul class="menu">
+                <li><a href="#">HOME</a></li>
+                <li><a href="#">ABOUT US</a></li>
+                <li><a href="#">SERVICE</a></li>
+                <li><a href="#">CONTACT</a></li>
+            </ul>
+            <a href="#" class="account" id="accountLink">Account</a>
+        </nav>
+      </header>
 
-  <section id="about">
-    <h2>About Us Section</h2>
-    <div class="container">
-      <!-- Immagine a destra e descrizione a sinistra -->
-      <div class="about-content">
-        <img src="/image/about-image.jpg" alt="About Image">
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam condimentum, nisi ut hendrerit vestibulum.</p>
-      </div>
-    </div>
-  </section>
-
-  <section id="contact">
-    <h2>Contact Section</h2>
-    <div class="container">
-      <!-- Contatti a sinistra e frase a destra -->
-      <div class="contact-content">
-        <div class="contact-info">
-          <p>Email: supermarket@gmail.com</p>
-          <p>Telefono: +987 567 789</p>
-          <p>Indirizzo: Via Clarissa, 123</p>
-        </div>
-        <div class="contact-message">
-          <p>Hai domande o commenti? Contattaci!</p>
+      <div class="modal" id="accountModal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="user-login">
+                <a href="/login">User Login</a>
+            </div>
+            <div class="market-login">
+                <a href="/login-supermarket">Supermarket Login</a>
+            </div>
         </div>
       </div>
-    </div>
-  </section>
-  <script src="/app.js"></script>
+
+    <div class="image-section">
+      <img src="/IMAGE/header.png" alt="Header dell'immagine">
+  </div>
+  <script src="menuH.js"></script>
 </body>
 </html>
