@@ -55,8 +55,6 @@ app.get('/login', (req, res) => {
     });
 });
 
-
-
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
@@ -111,7 +109,6 @@ app.get('/welcome', (req, res) => {
   });
 });
 
-
 app.get('/logout', (req, res) => {
 res.redirect('/');
 });
@@ -165,16 +162,59 @@ app.post('/register', async (req, res) => {
 });
 
 app.get('/carrello', (req, res) => {
-  // You can call the Users microservice login endpoint through the API Gateway
-  axios.get('http://localhost:4000/users/carrello', {params: req.body})
-    .then(response => {
-      res.status(response.status).send(response.data);
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-    });
+  const token = 'il-tuo-token-jwt'; // Sostituisci con il tuo token JWT
+
+  // Effettua una richiesta GET all'endpoint del microservizio utenti attraverso l'API Gateway
+  axios.get('http://localhost:4000/users/carrello', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: req.body,
+  })
+  .then(response => {
+    res.status(response.status).send(response.data);
+  })
+  .catch(error => {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  });
 });
+
+const microservizioURL = 'http://localhost:4000/users/';
+app.post('/aggiungi-al-carrello', async (req, res) => {
+  const { productId, quantity } = req.body;
+
+  // Verifica il token nell'header della richiesta
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token mancante' });
+  }
+
+  // Verifica e decodifica il token
+  jwt.verify(token.split(' ')[1], secretKey, async (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ error: 'Token non valido' });
+    }
+
+    const userId = decoded.userId;
+
+    // Inoltra la richiesta al microservizio
+    try {
+      const response = await axios.post(
+        `${microservizioURL}aggiungi-al-carrello`,
+        { userId, productId, quantity },
+        { headers: { Authorization: token } }
+      );
+
+      return res.status(response.status).json(response.data);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Errore interno del server' });
+    }
+  });
+});
+
 
 app.get('/supermercato', (req, res) => {
   // You can call the Users microservice login endpoint through the API Gateway
@@ -205,20 +245,57 @@ app.get('/login-supermarket', (req, res) => {
 });
 
 app.post('/login-supermarket', (req, res) => {
-  // You can call the Users microservice login endpoint through the API Gateway
   const { username, password } = req.body;
+
+  // Chiamare l'endpoint di login del microservizio degli utenti attraverso l'API Gateway
   axios.post('http://localhost:4000/supermarkets/login-supermarket', { username, password })
     .then(response => {
       if (response.status === 200) {
-        // Ottenere l'URL di reindirizzamento dal microservizio degli utenti
-        const redirectUrl = response.data.redirect;        
-         res.redirect(`${redirectUrl}?username=${username}`);
+        // Creare un token JWT
+        const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
+
+        // Passare il token nel redirect URL
+        const redirectUrl = `${response.data.redirect}?token=${token}`;
+        
+        res.redirect(redirectUrl);
       }
     })
     .catch(error => {
       console.error(error);
-      res.status(500).json({ error: 'Internal Server Error34' });
+      res.status(500).json({ error: 'Internal Server Error' });
     });
+});
+
+app.get('/supermarket-welcome', (req, res) => {
+  const token = req.query.token;
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token mancante' });
+  }
+
+  // Verificare e decodificare il token
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ error: 'Token non valido' });
+    }
+
+    // Fare una richiesta GET all'endpoint di benvenuto del microservizio degli utenti attraverso l'API Gateway
+    axios.get('http://localhost:4000/supermarkets/supermarket-welcome', {
+      headers: {
+        Authorization: `Bearer ${token}`,  // Assicurati che il formato sia corretto
+      },
+      params: {
+        username: decoded.username,
+      },
+    })
+    .then(response => {
+      res.status(response.status).send(response.data);
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    });
+  });
 });
 
 app.get('/register-supermarket', (req, res) => {
@@ -277,18 +354,7 @@ app.get('/supermercatoS', (req, res) => {
     });
 });
 
-app.get('/supermarket-welcome', (req, res) => {
-  const username = req.query.username;
-  // You can call the Supermarkets microservice supermercato endpoint through the API Gateway
-  axios.get(`http://localhost:4000/supermarkets/supermarket-welcome?username=${username}`)
-    .then(response => {
-      res.status(response.status).send(response.data);
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-    });
-});
+
 
 
 //Products Routes

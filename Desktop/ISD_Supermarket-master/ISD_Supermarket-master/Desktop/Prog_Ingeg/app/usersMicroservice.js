@@ -18,6 +18,7 @@ const db = new sqlite3.Database('users.db');
 const dbFolderPath = path.join(__dirname, 'db');
 const usersDbPath = path.join(dbFolderPath, 'users.db');
 const secretKey = 'your-secret-key';
+const router = express.Router();
 
 const initDb = () => {
   const initDbScript = fs.readFileSync(path.join(__dirname, 'db', 'init-db.sql'), 'utf8');
@@ -32,8 +33,6 @@ const initDb = () => {
 };
 
 initDb();
-
-const router = express.Router();
 
 /*router.get('/menu', (req, res) => {
   const filePath = path.join(__dirname, 'HTML', 'menu.html');
@@ -181,19 +180,6 @@ router.post('/register', [
   }
 });
 
-
-
-router.get('/carrello', (req, res) => {
-  const filePath = path.join(__dirname, 'HTML', 'carrello.html');
-  res.sendFile(filePath);
-});
-
-router.get('/supermercato', (req, res) => {
-  const filePath = path.join(__dirname, 'HTML', 'supermercato.html');
-  res.sendFile(filePath);
-});
-
-
 router.get('/logout', (req, res) => {
   try {
     // Azioni di logout necessarie
@@ -204,4 +190,69 @@ router.get('/logout', (req, res) => {
   }
 });
 
+
+router.get('/carrello', (req, res) => {
+  // Verifica il token nell'header della richiesta
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).send('Token mancante');
+  }
+
+  // Verifica e decodifica il token
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => { // Rimuovi il "Bearer" dal token
+    if (err) {
+      return res.status(401).send('Token non valido');
+    }
+
+    // L'utente è autenticato, puoi procedere con la risposta personalizzata
+    const filePath = path.join(__dirname, 'HTML', 'carrello.html');
+    res.sendFile(filePath);
+  });
+});
+
+
+let carrelloMicroservizio = {};
+
+router.post('/aggiungi-al-carrello', (req, res) => {
+  const { userId, productId, quantity } = req.body;
+
+  // Verifica il token nell'header della richiesta
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token mancante' });
+  }
+
+  // Verifica e decodifica il token
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ error: 'Token non valido' });
+    }
+
+    // Aggiungi il prodotto al carrello dell'utente nel microservizio
+    if (!carrelloMicroservizio[userId]) {
+      carrelloMicroservizio[userId] = {};
+    }
+
+    if (!carrelloMicroservizio[userId][productId]) {
+      carrelloMicroservizio[userId][productId] = 0;
+    }
+
+    carrelloMicroservizio[userId][productId] += parseInt(quantity, 10);
+
+    res.status(200).json({ message: 'Prodotto aggiunto al carrello del microservizio con successo' });
+  });
+});
+
+router.get('/supermercato', (req, res) => {
+  const filePath = path.join(__dirname, 'HTML', 'supermercato.html');
+  res.sendFile(filePath);
+});
+
+
+
+
 module.exports = router;
+
+
