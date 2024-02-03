@@ -205,7 +205,6 @@ app.post('/register', async (req, res) => {
 });
 
 
-
 const microservizioURL = 'http://localhost:4000/users/';
 app.post('/aggiungi-al-carrello', async (req, res) => {
   const { productId, quantity } = req.body;
@@ -311,7 +310,6 @@ app.post('/login-supermarket', (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     });
 });
-
 
 app.get('/supermarket-welcome', (req, res) => {
   const token = req.query.token;

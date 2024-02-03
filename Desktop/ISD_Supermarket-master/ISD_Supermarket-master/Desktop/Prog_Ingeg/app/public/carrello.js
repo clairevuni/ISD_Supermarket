@@ -28,6 +28,26 @@ function insertCartItems() {
     cartContainer.appendChild(cartItem);
   });
 
+  const addToCartButtons = document.querySelectorAll('.add-to-cart-button');
+addToCartButtons.forEach(button => {
+  button.addEventListener('click', addToCart);
+});
+
+// Funzione per gestire l'aggiunta al carrello
+async function addToCart(event) {
+  // Recupera l'id del prodotto dal bottone cliccato
+  const productId = event.target.dataset.productId;
+
+  // Effettua la richiesta al server per aggiungere il prodotto al carrello
+  try {
+    const response = await axios.post('/aggiungi-al-carrello', { productId });
+    alert(response.data.message);  // Mostra un messaggio di successo
+  } catch (error) {
+    console.error(error);
+    alert('Errore durante l\'aggiunta al carrello');  // Mostra un messaggio di errore
+  }
+}
+
   // Funzione per svuotare il carrello
   function emptyCart() {
     // Rimuovi tutti gli elementi dal carrello

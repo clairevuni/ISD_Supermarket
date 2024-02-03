@@ -228,7 +228,6 @@ router.post('/save-product', (req, res) => {
   );
 });
 
-
 router.get('/get-products', (req, res) => {
   const getProductsQuery = 'SELECT * FROM supermarket_products';
 
