@@ -86,44 +86,6 @@ router.post('/login', (req, res) => {
   });
 });
 
-router.get('/welcome', (req, res) => {
-  const { username } = req.query;
-
-  // Verificare il token nell'header della richiesta
-  const token = req.header('Authorization');
-  //console.log(req.header('Authorization'));
-
-  if (!token) {
-    return res.status(401).send('Token mancante');
-  }
-
-  // Verificare e decodificare il token
-  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {  // Rimuovi il "Bearer" dal token
-    if (err) {
-      return res.status(401).send('Token non valido');
-    }
-
-    // L'utente è autenticato, puoi procedere con la risposta personalizzata
-    const filePath = path.join(__dirname, 'HTML', 'welcome.html');
-    fs.readFile(filePath, 'utf8', (readErr, data) => {
-      if (readErr) {
-        console.error(readErr);
-        return res.status(500).send('Internal Server Error');
-      }
-
-      const welcomeMessage = `Welcome, ${decoded.username || 'Guest'}!`;
-      const renderedHTML = data.replace('<!--#welcome-message-->', welcomeMessage);
-
-      const userWelcomeMessage = decoded.username
-        ? `Welcome, ${decoded.username}! What we are doing today?`
-        : 'Welcome, Guest!';
-      const userRenderedHTML = renderedHTML.replace('<!--#welcome-user-->', userWelcomeMessage);
-
-      res.status(200).send(userRenderedHTML);
-    });
-  });
-});
-
 router.get('/register', (req, res) => {
   const filePath = path.join(__dirname, 'HTML', 'register.html');
   fs.readFile(filePath, 'utf8', (err, data) => {
@@ -181,6 +143,103 @@ router.post('/register', [
   }
 });
 
+router.get('/welcome', (req, res) => {
+  const { username } = req.query;
+
+  // Verificare il token nell'header della richiesta
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).send('Token mancante');
+  }
+
+  // Verificare e decodificare il token
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {  // Rimuovi il "Bearer" dal token
+    if (err) {
+      return res.status(401).send('Token non valido');
+    }
+
+    // L'utente è autenticato, puoi procedere con la risposta personalizzata
+    const filePath = path.join(__dirname, 'HTML', 'welcome.html');
+    fs.readFile(filePath, 'utf8', (readErr, data) => {
+      if (readErr) {
+        console.error(readErr);
+        return res.status(500).send('Internal Server Error');
+      }
+
+      const welcomeMessage = `Welcome, ${decoded.username || 'Guest'}!`;
+      const renderedHTML = data.replace('<!--#welcome-message-->', welcomeMessage);
+
+      const userWelcomeMessage = decoded.username
+        ? `Welcome, ${decoded.username}! What we are doing today?`
+        : 'Welcome, Guest!';
+      const userRenderedHTML = renderedHTML.replace('<!--#welcome-user-->', userWelcomeMessage);
+
+      res.status(200).send(userRenderedHTML);
+    });
+  });
+});
+
+
+router.get('/carrello', (req, res) => {
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).send('Token mancante');
+  }
+
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).send('Token non valido');
+    }
+
+    // Esegui le operazioni specifiche del carrello e restituisci la risposta al server principale
+    const filePath = path.join(__dirname, 'HTML', 'carrello.html');
+    fs.readFile(filePath, 'utf8', (readErr, data) => {
+      if (readErr) {
+        console.error(readErr);
+        return res.status(500).send('Internal Server Error');
+      }
+
+      // Personalizza la risposta in base all'utente autenticato
+      const userMessage = `Benvenuto nel carrello, ${decoded.username || 'Visitatore'}!`;
+      const renderedHTML = data.replace('<!--#carrello-message-->', userMessage);
+
+      res.status(200).send(renderedHTML);
+    });
+  });
+});
+
+
+router.get('/supermercato', (req, res) => {
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).send('Token mancante');
+  }
+
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).send('Token non valido');
+    }
+
+    // Esegui le operazioni specifiche del supermercato e restituisci la risposta al server principale
+    const filePath = path.join(__dirname, 'HTML', 'supermercato.html');
+    fs.readFile(filePath, 'utf8', (readErr, data) => {
+      if (readErr) {
+        console.error(readErr);
+        return res.status(500).send('Internal Server Error');
+      }
+
+      // Personalizza la risposta in base all'utente autenticato
+      const userMessage = `Benvenuto al supermercato, ${decoded.username || 'Visitatore'}!`;
+      const renderedHTML = data.replace('<!--#supermercato-message-->', userMessage);
+
+      res.status(200).send(renderedHTML);
+    });
+  });
+});
+
 router.get('/logout', (req, res) => {
   try {
     // Azioni di logout necessarie
@@ -190,114 +249,5 @@ router.get('/logout', (req, res) => {
     res.status(500).json({ error: 'Internal Server Error!!' });
   }
 });
-
-
-router.get('/carrello', (req, res) => {
-  try {
-    const { username } = req.query;
-
-    // Verifica il token nell'header della richiesta
-    const token = req.header('Authorization');
-    console.log(token);
-
-    if (!token) {
-      return res.status(401).send('Token mancante');
-    }
-    
-    // Verifica e decodifica il token
-    const decoded = jwt.verify(token.split(' ')[1], secretKey);
-
-    // L'utente è autenticato, puoi procedere con la risposta personalizzata
-    const filePath = path.join(__dirname, 'HTML', 'carrello.html');
-    fs.readFile(filePath, 'utf8', (err, data) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send('Internal Server Error..');
-      } else {
-        res.setHeader('Content-Type', 'text/html'); // Imposta manualmente l'header Content-Type
-        res.status(200).send(data); 
-      }
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Errore interno del server: ' + error.message);
-  }
-});
-
-
-
-
-let carrelloMicroservizio = {};
-
-router.post('/aggiungi-al-carrello', (req, res) => {
-  const { userId, productId, quantity } = req.body;
-
-  // Verifica il token nell'header della richiesta
-  const token = req.header('Authorization');
-
-  if (!token) {
-    return res.status(401).json({ error: 'Token mancante' });
-  }
-
-  // Verifica e decodifica il token
-  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ error: 'Token non valido' });
-    }
-
-    // Aggiungi il prodotto al carrello dell'utente nel microservizio
-    if (!carrelloMicroservizio[userId]) {
-      carrelloMicroservizio[userId] = {};
-    }
-
-    if (!carrelloMicroservizio[userId][productId]) {
-      carrelloMicroservizio[userId][productId] = 0;
-    }
-
-    carrelloMicroservizio[userId][productId] += parseInt(quantity, 10);
-
-    res.status(200).json({ message: 'Prodotto aggiunto al carrello del microservizio con successo' });
-  });
-});
-
-  // Assicurati di usare la stessa chiave segreta usata per firmare i token
-
-router.get('/supermercato', (req, res) => {
-  // Verificare il token nell'header della richiesta
-  const token = req.header('Authorization');
-
-  if (!token) {
-    return res.status(401).send('Token mancante');
-  }
-
-  // Verificare e decodificare il token
-  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {
-    if (err) {
-      return res.status(401).send('Token non valido.');
-    }
-
-    // L'utente è autenticato, puoi procedere con la logica per recuperare i prodotti da tutti i supermercati
-    // In questo esempio, utilizzo un endpoint fittizio come esempio. Sostituiscilo con la tua logica reale.
-    axios.get('http://localhost:4000/supermarkets/get-products', {
-      headers: {
-        Authorization: `Bearer ${token}`,  // Assicurati che il formato sia corretto
-      },
-      params: { 
-        username: decoded.username,
-      },
-    })
-    .then(response => {
-      res.status(response.status).send(response.data);
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-    });
-  });
-});
-
-
-
-
 
 module.exports = router;

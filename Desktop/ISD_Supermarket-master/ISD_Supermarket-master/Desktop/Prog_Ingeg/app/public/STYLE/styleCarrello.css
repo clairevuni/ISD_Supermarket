@@ -61,6 +61,12 @@ body {
     text-align: center;
   }
   
+  #carrelloMessage {
+    color: #fff;
+    text-align: center;
+    margin: 20px;
+  }
+  
   .logout-link {
     margin-top: 20px;
     color: #0f1d32;

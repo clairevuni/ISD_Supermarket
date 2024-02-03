@@ -39,7 +39,7 @@ function insertProducts(products, username) {
     price.textContent = `Prezzo: ${product.price}`;
 
     const addToCartButton = document.createElement('button');
-    addToCartButton.textContent = 'Aggiungi al Carrello';
+    addToCartButton.textContent = '';
 
     const supermarketNameElement = document.createElement('p');
     supermarketNameElement.classList.add('username');

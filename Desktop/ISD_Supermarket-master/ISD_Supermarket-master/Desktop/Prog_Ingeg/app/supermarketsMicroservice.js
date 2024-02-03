@@ -19,7 +19,6 @@ const dbSupermarkets = new sqlite3.Database('supermarkets.db');
 const dbFolderPath = path.join(__dirname, 'db');
 const spmDbPath = path.join(dbFolderPath, 'supermarkets.db');
 const secretKey = 'your-secret-key';
-
 const initSupermarketsDb = () => {
   const initSupermarketsDbScript = fs.readFileSync(path.join(__dirname, 'db', 'init-supermarkets-db.sql'), 'utf8');
 
@@ -33,6 +32,8 @@ const initSupermarketsDb = () => {
 };
 
 initSupermarketsDb();
+
+
 
 router.get('/login-supermarket', (req, res) => {
   const filePath = path.join(__dirname, 'HTML', 'login-supermarket.html');
@@ -96,6 +97,7 @@ router.post('/register-supermarket', [
   }
 });
 
+
 router.post('/login-supermarket', (req, res) => {
   const { username, password } = req.body;
 
@@ -141,7 +143,7 @@ router.get('/supermarket-welcome', (req, res) => {
   }
 
   // Verificare e decodificare il token
-  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {  
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {  // Rimuovi il "Bearer" dal token
     if (err) {
       return res.status(401).send('Token non valido');
     }
@@ -168,7 +170,6 @@ router.get('/supermarket-welcome', (req, res) => {
 });
 
 
-
 const initProductsDb = () => {
   const initProductsDbScript = fs.readFileSync(path.join(__dirname, 'db', 'init-products-db.sql'), 'utf8');
 
@@ -183,7 +184,6 @@ const initProductsDb = () => {
 initProductsDb();
 
 router.get('/supermercatoS', (req, res) => {
-  const { username } = req.query;
   try {
     const filePath = path.join(__dirname, 'HTML', 'supermercatoS.html');
     res.sendFile(filePath);
@@ -197,36 +197,39 @@ router.post('/save-product', (req, res) => {
   const { supermarketName } = req.params;
   const { productName, productCategory, productPrice, productDescription } = req.body;
 
-  const insertProductQuery = 'INSERT INTO supermarket_products (name, category, price, description, supermarket_name) VALUES (?, ?, ?, ?, ?)';
+  const insertProductQuery = 'INSERT INTO supermarket_products (name, category, price, description) VALUES (?, ?, ?, ?)';
 
+  // Inizia la transazione
   dbSupermarkets.run('BEGIN TRANSACTION');
 
-  dbSupermarkets.run(
-    insertProductQuery,
-    [productName, productCategory, productPrice, productDescription, supermarketName],
-    (insertErr) => {
-      if (insertErr) {
-        console.error(insertErr);
+  // Esegui l'inserimento del prodotto
+  dbSupermarkets.run(insertProductQuery, [productName, productCategory, productPrice, productDescription], insertErr => {
+    if (insertErr) {
+      console.error(insertErr);
 
-        dbSupermarkets.run('ROLLBACK', (rollbackErr) => {
-          if (rollbackErr) {
-            console.error(rollbackErr);
-            return res.status(500).json({ error: 'Rollback Error', details: rollbackErr.message });
-          }
-          return res.status(500).json({ error: 'Insert Error', details: insertErr.message });
-        });
-      } else {
-        dbSupermarkets.run('COMMIT', (commitErr) => {
-          if (commitErr) {
-            console.error(commitErr);
-            return res.status(500).json({ error: 'Commit Error', details: commitErr.message });
-          }
-          res.status(200).json({ message: 'Product saved successfully' });
-        });
-      }
+      // Rollback della transazione in caso di errore
+      dbSupermarkets.run('ROLLBACK', rollbackErr => {
+        if (rollbackErr) {
+          console.error(rollbackErr);
+          return res.status(500).json({ error: 'Internal Server Error', details: rollbackErr.message });
+        }
+        return res.status(500).json({ error: 'Internal Server Error', details: insertErr.message });
+      });
+    } else {
+      // Esegui il commit della transazione solo se non ci sono errori
+      dbSupermarkets.run('COMMIT', commitErr => {
+        if (commitErr) {
+          console.error(commitErr);
+          return res.status(500).json({ error: 'Internal Server Error', details: commitErr.message });
+        }
+        // Invia una risposta di successo
+        res.status(200).json({ message: 'Product saved successfully' });
+      });
     }
-  );
+  });
 });
+
+
 
 router.get('/get-products', (req, res) => {
   const getProductsQuery = 'SELECT * FROM supermarket_products';
