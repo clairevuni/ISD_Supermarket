@@ -1,10 +1,20 @@
--- init-db.sql
+-- Modifica il tuo file init-db.sql
 
 -- Crea la tabella degli utenti se non esiste
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT,
   password TEXT
+);
+
+-- Crea la tabella del carrello se non esiste
+CREATE TABLE IF NOT EXISTS user_cart (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  product_id INTEGER,
+  quantity INTEGER,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
 -- Inserisci utenti di esempio

@@ -61,11 +61,14 @@ app.get('/login', (req, res) => {
 
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
-  const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
 
   axios.post('http://localhost:4000/users/login', { username, password })
     .then(response => {
       if (response.status === 200) {
+        // Genera un token JWT con un ID univoco dell'utente
+        const userId = response.data.userId;  // Assumi che il microservizio restituisca l'ID dell'utente
+        const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
+
         // Imposta il cookie con il token JWT
         res.cookie('token', token, { httpOnly: true, secure: true }); // Aggiungi 'secure: true' solo se usi HTTPS
         const redirectUrl = response.data.redirect;
@@ -77,6 +80,7 @@ app.post('/login', (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     });
 });
+
 
 app.get('/welcome', authenticateToken, (req, res) => {
   const token = req.cookies['token'];

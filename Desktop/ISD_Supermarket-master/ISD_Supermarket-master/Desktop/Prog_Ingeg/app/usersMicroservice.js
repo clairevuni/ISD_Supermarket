@@ -53,9 +53,9 @@ router.get('/login', (req, res) => {
 });
 
 router.post('/login', (req, res) => {
-  const { username, password, token } = req.body;
+  const { username, password } = req.body;
 
-  const query = 'SELECT * FROM users WHERE username = ?';
+  const query = 'SELECT id, username, password FROM users WHERE username = ?';
 
   db.get(query, [username], (err, row) => {
     if (err) {
@@ -75,8 +75,9 @@ router.post('/login', (req, res) => {
 
       if (bcryptResult) {
         // Successful login
-        // Creare un token JWT
-        //const token = jwt.sign({ username }, 'your-secret-key', { expiresIn: '1h' });
+        // Creare un token JWT utilizzando l'ID dell'utente come parte dei dati da firmare
+        const userId = row.id;
+        const token = jwt.sign({ userId }, 'your-secret-key', { expiresIn: '1h' });
 
         res.status(200).json({ message: 'Login successful', redirect: '/welcome', token });
       } else {
@@ -85,6 +86,7 @@ router.post('/login', (req, res) => {
     });
   });
 });
+
 
 router.get('/register', (req, res) => {
   const filePath = path.join(__dirname, 'HTML', 'register.html');
@@ -144,23 +146,19 @@ router.post('/register', [
 });
 
 router.get('/welcome', (req, res) => {
-  const { username } = req.query;
-
-  // Verificare il token nell'header della richiesta
   const token = req.header('Authorization');
 
   if (!token) {
     return res.status(401).send('Token mancante');
   }
 
-  // Verificare e decodificare il token
-  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {  // Rimuovi il "Bearer" dal token
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {
     if (err) {
       return res.status(401).send('Token non valido');
     }
 
-    // L'utente è autenticato, puoi procedere con la risposta personalizzata
     const filePath = path.join(__dirname, 'HTML', 'welcome.html');
+    
     fs.readFile(filePath, 'utf8', (readErr, data) => {
       if (readErr) {
         console.error(readErr);
@@ -168,17 +166,19 @@ router.get('/welcome', (req, res) => {
       }
 
       const welcomeMessage = `Welcome, ${decoded.username || 'Guest'}!`;
-      const renderedHTML = data.replace('<!--#welcome-message-->', welcomeMessage);
-
       const userWelcomeMessage = decoded.username
-        ? `Welcome, ${decoded.username}! What we are doing today?`
+        ? `Welcome, ${decoded.username}! What are we doing today?`
         : 'Welcome, Guest!';
-      const userRenderedHTML = renderedHTML.replace('<!--#welcome-user-->', userWelcomeMessage);
 
-      res.status(200).send(userRenderedHTML);
+      const renderedHTML = data
+        .replace('<!--#welcome-message-->', welcomeMessage)
+        .replace('<!--#welcome-user-->', userWelcomeMessage);
+
+      res.status(200).send(renderedHTML);
     });
   });
 });
+
 
 
 router.get('/carrello', (req, res) => {
@@ -249,5 +249,11 @@ router.get('/logout', (req, res) => {
     res.status(500).json({ error: 'Internal Server Error!!' });
   }
 });
+
+
+
+
+
+
 
 module.exports = router;
