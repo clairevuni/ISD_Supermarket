@@ -18,6 +18,7 @@ const db = new sqlite3.Database('users.db');
 const dbFolderPath = path.join(__dirname, 'db');
 const usersDbPath = path.join(dbFolderPath, 'users.db');
 const secretKey = 'your-secret-key';
+const router = express.Router();
 
 const initDb = () => {
   const initDbScript = fs.readFileSync(path.join(__dirname, 'db', 'init-db.sql'), 'utf8');
@@ -32,8 +33,6 @@ const initDb = () => {
 };
 
 initDb();
-
-const router = express.Router();
 
 /*router.get('/menu', (req, res) => {
   const filePath = path.join(__dirname, 'HTML', 'menu.html');
@@ -54,7 +53,7 @@ router.get('/login', (req, res) => {
 });
 
 router.post('/login', (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, token } = req.body;
 
   const query = 'SELECT * FROM users WHERE username = ?';
 
@@ -77,7 +76,7 @@ router.post('/login', (req, res) => {
       if (bcryptResult) {
         // Successful login
         // Creare un token JWT
-        const token = jwt.sign({ username }, 'your-secret-key', { expiresIn: '1h' });
+        //const token = jwt.sign({ username }, 'your-secret-key', { expiresIn: '1h' });
 
         res.status(200).json({ message: 'Login successful', redirect: '/welcome', token });
       } else {
@@ -92,6 +91,7 @@ router.get('/welcome', (req, res) => {
 
   // Verificare il token nell'header della richiesta
   const token = req.header('Authorization');
+  //console.log(req.header('Authorization'));
 
   if (!token) {
     return res.status(401).send('Token mancante');
@@ -181,19 +181,6 @@ router.post('/register', [
   }
 });
 
-
-
-router.get('/carrello', (req, res) => {
-  const filePath = path.join(__dirname, 'HTML', 'carrello.html');
-  res.sendFile(filePath);
-});
-
-router.get('/supermercato', (req, res) => {
-  const filePath = path.join(__dirname, 'HTML', 'supermercato.html');
-  res.sendFile(filePath);
-});
-
-
 router.get('/logout', (req, res) => {
   try {
     // Azioni di logout necessarie
@@ -203,5 +190,114 @@ router.get('/logout', (req, res) => {
     res.status(500).json({ error: 'Internal Server Error!!' });
   }
 });
+
+
+router.get('/carrello', (req, res) => {
+  try {
+    const { username } = req.query;
+
+    // Verifica il token nell'header della richiesta
+    const token = req.header('Authorization');
+    console.log(token);
+
+    if (!token) {
+      return res.status(401).send('Token mancante');
+    }
+    
+    // Verifica e decodifica il token
+    const decoded = jwt.verify(token.split(' ')[1], secretKey);
+
+    // L'utente è autenticato, puoi procedere con la risposta personalizzata
+    const filePath = path.join(__dirname, 'HTML', 'carrello.html');
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send('Internal Server Error..');
+      } else {
+        res.setHeader('Content-Type', 'text/html'); // Imposta manualmente l'header Content-Type
+        res.status(200).send(data); 
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Errore interno del server: ' + error.message);
+  }
+});
+
+
+
+
+let carrelloMicroservizio = {};
+
+router.post('/aggiungi-al-carrello', (req, res) => {
+  const { userId, productId, quantity } = req.body;
+
+  // Verifica il token nell'header della richiesta
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token mancante' });
+  }
+
+  // Verifica e decodifica il token
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ error: 'Token non valido' });
+    }
+
+    // Aggiungi il prodotto al carrello dell'utente nel microservizio
+    if (!carrelloMicroservizio[userId]) {
+      carrelloMicroservizio[userId] = {};
+    }
+
+    if (!carrelloMicroservizio[userId][productId]) {
+      carrelloMicroservizio[userId][productId] = 0;
+    }
+
+    carrelloMicroservizio[userId][productId] += parseInt(quantity, 10);
+
+    res.status(200).json({ message: 'Prodotto aggiunto al carrello del microservizio con successo' });
+  });
+});
+
+  // Assicurati di usare la stessa chiave segreta usata per firmare i token
+
+router.get('/supermercato', (req, res) => {
+  // Verificare il token nell'header della richiesta
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).send('Token mancante');
+  }
+
+  // Verificare e decodificare il token
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).send('Token non valido.');
+    }
+
+    // L'utente è autenticato, puoi procedere con la logica per recuperare i prodotti da tutti i supermercati
+    // In questo esempio, utilizzo un endpoint fittizio come esempio. Sostituiscilo con la tua logica reale.
+    axios.get('http://localhost:4000/supermarkets/get-products', {
+      headers: {
+        Authorization: `Bearer ${token}`,  // Assicurati che il formato sia corretto
+      },
+      params: { 
+        username: decoded.username,
+      },
+    })
+    .then(response => {
+      res.status(response.status).send(response.data);
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    });
+  });
+});
+
+
+
+
 
 module.exports = router;

@@ -1,3 +1,6 @@
+// Recupera l'username dal local storage (se presente)
+const username = JSON.parse(localStorage.getItem('username'));
+
 // Recupera il numero di prodotti nel carrello dal localStorage
 const cartCount = JSON.parse(localStorage.getItem('cart'))?.length || 0;
 
@@ -14,7 +17,7 @@ cartIcon.addEventListener('click', () => {
 document.body.appendChild(cartIcon);
 
 // Funzione per inserire dinamicamente le card dei prodotti
-function insertProducts(products, supermarketName) {
+function insertProducts(products, username) {
   const productsContainer = document.getElementById('productsContainer');
 
   // Popolamento delle card
@@ -92,5 +95,5 @@ function insertProducts(products, supermarketName) {
 // Richiedi al server di ottenere i prodotti
 fetch('/get-products')
   .then(response => response.json())
-  .then(data => insertProducts(data, 'Nome Supermercato')) // Sostituisci 'Nome Supermercato' con il nome reale del supermercato
+  .then(data => insertProducts(data, username)) // Passa l'username dinamico alla funzione
   .catch(error => console.error('Error fetching products:', error));

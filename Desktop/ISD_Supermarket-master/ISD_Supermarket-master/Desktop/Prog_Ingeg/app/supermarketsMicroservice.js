@@ -13,10 +13,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({ secret: 'your-secret-key', resave: true, saveUninitialized: true }));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 const router = express.Router();
-
+const jwt = require('jsonwebtoken');
+const { createSecretKey } = require('crypto');
 const dbSupermarkets = new sqlite3.Database('supermarkets.db');
 const dbFolderPath = path.join(__dirname, 'db');
 const spmDbPath = path.join(dbFolderPath, 'supermarkets.db');
+const secretKey = 'your-secret-key';
 
 const initSupermarketsDb = () => {
   const initSupermarketsDbScript = fs.readFileSync(path.join(__dirname, 'db', 'init-supermarkets-db.sql'), 'utf8');
@@ -31,8 +33,6 @@ const initSupermarketsDb = () => {
 };
 
 initSupermarketsDb();
-
-
 
 router.get('/login-supermarket', (req, res) => {
   const filePath = path.join(__dirname, 'HTML', 'login-supermarket.html');
@@ -96,7 +96,6 @@ router.post('/register-supermarket', [
   }
 });
 
-
 router.post('/login-supermarket', (req, res) => {
   const { username, password } = req.body;
 
@@ -109,7 +108,7 @@ router.post('/login-supermarket', (req, res) => {
     }
 
     if (!row) {
-      return res.status(401).send('Authentication Failed: User not found');
+      return res.status(401).send('Authentication Failed: Supermarket not found');
     }
 
     bcrypt.compare(password, row.password, (bcryptErr, bcryptResult) => {
@@ -120,8 +119,10 @@ router.post('/login-supermarket', (req, res) => {
 
       if (bcryptResult) {
         // Successful login
-        const redirectUrl = '/supermarket-welcome'; // Indica la pagina di benvenuto
-        res.status(200).json({ message: 'Login successful', redirect: redirectUrl, username: username });
+        // Creare un token JWT
+        const token = jwt.sign({ username }, 'your-secret-key', { expiresIn: '1h' });
+
+        res.status(200).json({ message: 'Login successful', redirect: '/supermarket-welcome', token });
       } else {
         res.status(401).send('Authentication Failed');
       }
@@ -131,23 +132,41 @@ router.post('/login-supermarket', (req, res) => {
 
 router.get('/supermarket-welcome', (req, res) => {
   const { username } = req.query;
-  const filePath = path.join(__dirname, 'HTML', 'supermarket-welcome.html');
 
-  fs.readFile(filePath, 'utf8', (err, data) => {
+  // Verificare il token nell'header della richiesta
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).send('Token mancante');
+  }
+
+  // Verificare e decodificare il token
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {  
     if (err) {
-      console.error(err);
-      return res.status(500).send('Internal Server Error');
+      return res.status(401).send('Token non valido');
     }
 
-  const welcomeMessage = `Welcome, ${username || 'Supermarket'}!`;
-const renderedHTML = data.replace('<!--#welcome-message-->', welcomeMessage);
+    // L'utente Ã¨ autenticato, puoi procedere con la risposta personalizzata
+    const filePath = path.join(__dirname, 'HTML', 'supermarket-welcome.html');
+    fs.readFile(filePath, 'utf8', (readErr, data) => {
+      if (readErr) {
+        console.error(readErr);
+        return res.status(500).send('Internal Server Error');
+      }
 
-const userWelcomeMessage = username ? `Welcome, ${username}! What we are doing today?` : 'Welcome, Supermarket!';
-const userRenderedHTML = renderedHTML.replace('<!--#welcome-user-->', userWelcomeMessage);
+      const welcomeMessage = `Welcome, ${decoded.username || 'Guest'}!`;
+      const renderedHTML = data.replace('<!--#welcome-message-->', welcomeMessage);
 
-res.status(200).send(userRenderedHTML);
+      const spmWelcomeMessage = decoded.username
+        ? `Welcome, ${decoded.username}! What we are doing today?`
+        : 'Welcome, Guest!';
+      const spmRenderedHTML = renderedHTML.replace('<!--#welcome-user-->', spmWelcomeMessage);
+
+      res.status(200).send(spmRenderedHTML);
+    });
   });
 });
+
 
 
 const initProductsDb = () => {
@@ -178,38 +197,36 @@ router.post('/save-product', (req, res) => {
   const { supermarketName } = req.params;
   const { productName, productCategory, productPrice, productDescription } = req.body;
 
-  const insertProductQuery = 'INSERT INTO supermarket_products (name, category, price, description) VALUES (?, ?, ?, ?)';
+  const insertProductQuery = 'INSERT INTO supermarket_products (name, category, price, description, supermarket_name) VALUES (?, ?, ?, ?, ?)';
 
-  // Inizia la transazione
   dbSupermarkets.run('BEGIN TRANSACTION');
 
-  // Esegui l'inserimento del prodotto
-  dbSupermarkets.run(insertProductQuery, [productName, productCategory, productPrice, productDescription], insertErr => {
-    if (insertErr) {
-      console.error(insertErr);
+  dbSupermarkets.run(
+    insertProductQuery,
+    [productName, productCategory, productPrice, productDescription, supermarketName],
+    (insertErr) => {
+      if (insertErr) {
+        console.error(insertErr);
 
-      // Rollback della transazione in caso di errore
-      dbSupermarkets.run('ROLLBACK', rollbackErr => {
-        if (rollbackErr) {
-          console.error(rollbackErr);
-          return res.status(500).json({ error: 'Internal Server Error', details: rollbackErr.message });
-        }
-        return res.status(500).json({ error: 'Internal Server Error', details: insertErr.message });
-      });
-    } else {
-      // Esegui il commit della transazione solo se non ci sono errori
-      dbSupermarkets.run('COMMIT', commitErr => {
-        if (commitErr) {
-          console.error(commitErr);
-          return res.status(500).json({ error: 'Internal Server Error', details: commitErr.message });
-        }
-        // Invia una risposta di successo
-        res.status(200).json({ message: 'Product saved successfully' });
-      });
+        dbSupermarkets.run('ROLLBACK', (rollbackErr) => {
+          if (rollbackErr) {
+            console.error(rollbackErr);
+            return res.status(500).json({ error: 'Rollback Error', details: rollbackErr.message });
+          }
+          return res.status(500).json({ error: 'Insert Error', details: insertErr.message });
+        });
+      } else {
+        dbSupermarkets.run('COMMIT', (commitErr) => {
+          if (commitErr) {
+            console.error(commitErr);
+            return res.status(500).json({ error: 'Commit Error', details: commitErr.message });
+          }
+          res.status(200).json({ message: 'Product saved successfully' });
+        });
+      }
     }
-  });
+  );
 });
-
 
 
 router.get('/get-products', (req, res) => {

@@ -3,5 +3,6 @@ CREATE TABLE IF NOT EXISTS supermarket_products (
   name TEXT NOT NULL,
   category TEXT,
   price REAL,
-  description TEXT
+  description TEXT,
+  supermarket_name TEXT NOT NULL
 );
