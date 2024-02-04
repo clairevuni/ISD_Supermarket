@@ -10,7 +10,7 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({ secret: 'your-secret-key', resave: true, saveUninitialized: true }));
+app.use(session({ secret: 'uominiseksi', resave: true, saveUninitialized: true }));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 const router = express.Router();
 const jwt = require('jsonwebtoken');
@@ -18,7 +18,7 @@ const { createSecretKey } = require('crypto');
 const dbSupermarkets = new sqlite3.Database('supermarkets.db');
 const dbFolderPath = path.join(__dirname, 'db');
 const spmDbPath = path.join(dbFolderPath, 'supermarkets.db');
-const secretKey = 'your-secret-key';
+const secretKey = 'uominiseksi';
 const initSupermarketsDb = () => {
   const initSupermarketsDbScript = fs.readFileSync(path.join(__dirname, 'db', 'init-supermarkets-db.sql'), 'utf8');
 
@@ -120,9 +120,8 @@ router.post('/login-supermarket', (req, res) => {
       }
 
       if (bcryptResult) {
-        // Successful login
-        // Creare un token JWT
-        const token = jwt.sign({ username }, 'your-secret-key', { expiresIn: '1h' });
+
+        const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
 
         res.status(200).json({ message: 'Login successful', redirect: '/supermarket-welcome', token });
       } else {
@@ -135,20 +134,17 @@ router.post('/login-supermarket', (req, res) => {
 router.get('/supermarket-welcome', (req, res) => {
   const { username } = req.query;
 
-  // Verificare il token nell'header della richiesta
   const token = req.header('Authorization');
 
   if (!token) {
     return res.status(401).send('Token mancante');
   }
 
-  // Verificare e decodificare il token
   jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {  // Rimuovi il "Bearer" dal token
     if (err) {
       return res.status(401).send('Token non valido');
     }
 
-    // L'utente Ã¨ autenticato, puoi procedere con la risposta personalizzata
     const filePath = path.join(__dirname, 'HTML', 'supermarket-welcome.html');
     fs.readFile(filePath, 'utf8', (readErr, data) => {
       if (readErr) {
@@ -160,7 +156,7 @@ router.get('/supermarket-welcome', (req, res) => {
       const renderedHTML = data.replace('<!--#welcome-message-->', welcomeMessage);
 
       const spmWelcomeMessage = decoded.username
-        ? `Welcome, ${decoded.username}! What we are doing today?`
+        ? `Welcome, ${decoded.username}! What products do you want to add?`
         : 'Welcome, Guest!';
       const spmRenderedHTML = renderedHTML.replace('<!--#welcome-user-->', spmWelcomeMessage);
 
@@ -184,13 +180,49 @@ const initProductsDb = () => {
 initProductsDb();
 
 router.get('/supermercatoS', (req, res) => {
-  try {
-    const filePath = path.join(__dirname, 'HTML', 'supermercatoS.html');
-    res.sendFile(filePath);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal Server Error');
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).send('Token mancante');
   }
+
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).send('Token non valido');
+    }
+    const filePath = path.join(__dirname, 'HTML', 'supermercatoS.html');
+    fs.readFile(filePath, 'utf8', (readErr, data) => {
+      if (readErr) {
+        console.error(readErr);
+        return res.status(500).send('Internal Server Error');
+      }
+
+      res.status(200).send(data);
+    });
+  });
+});
+
+router.get('/aggiungiprodotti', (req, res) => {
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).send('Token mancante');
+  }
+
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).send('Token non valido');
+    }
+    const filePath = path.join(__dirname, 'HTML', 'aggiungiprodotti.html');
+    fs.readFile(filePath, 'utf8', (readErr, data) => {
+      if (readErr) {
+        console.error(readErr);
+        return res.status(500).send('Internal Server Error');
+      }
+
+      res.status(200).send(data);
+    });
+  });
 });
 
 router.post('/save-product', (req, res) => {
@@ -199,15 +231,13 @@ router.post('/save-product', (req, res) => {
 
   const insertProductQuery = 'INSERT INTO supermarket_products (name, category, price, description) VALUES (?, ?, ?, ?)';
 
-  // Inizia la transazione
   dbSupermarkets.run('BEGIN TRANSACTION');
 
-  // Esegui l'inserimento del prodotto
   dbSupermarkets.run(insertProductQuery, [productName, productCategory, productPrice, productDescription], insertErr => {
     if (insertErr) {
       console.error(insertErr);
 
-      // Rollback della transazione in caso di errore
+
       dbSupermarkets.run('ROLLBACK', rollbackErr => {
         if (rollbackErr) {
           console.error(rollbackErr);
@@ -216,20 +246,18 @@ router.post('/save-product', (req, res) => {
         return res.status(500).json({ error: 'Internal Server Error', details: insertErr.message });
       });
     } else {
-      // Esegui il commit della transazione solo se non ci sono errori
       dbSupermarkets.run('COMMIT', commitErr => {
         if (commitErr) {
           console.error(commitErr);
           return res.status(500).json({ error: 'Internal Server Error', details: commitErr.message });
         }
-        // Invia una risposta di successo
-        res.status(200).json({ message: 'Product saved successfully' });
-      });
+        const token = jwt.sign({ supermarketName }, secretKey, { expiresIn: '1h' });
+
+        res.status(200).json({ message: 'OK!!', redirect: '/supermercatoS', token });
+       });
     }
   });
 });
-
-
 
 router.get('/get-products', (req, res) => {
   const getProductsQuery = 'SELECT * FROM supermarket_products';
@@ -239,7 +267,6 @@ router.get('/get-products', (req, res) => {
       console.error(err);
       return res.status(500).json({ error: 'Internal Server Error', details: err.message });
     } else {
-      // Invia una risposta JSON
       return res.status(200).json(rows);
     }
   });

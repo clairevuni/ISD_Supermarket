@@ -11,12 +11,11 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS user_cart (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER,
-  product_id INTEGER,
+  external_product_id INTEGER,
+  external_product_database TEXT,
   quantity INTEGER,
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (product_id) REFERENCES products(id)
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
-
 -- Inserisci utenti di esempio
 INSERT INTO users (username, password) VALUES
   ('admin', '$2b$10$Tu4kD4Vgub.D78gJnNVvrO4weM/kf9Fp6x/B4eKqSFRifp67GADfa'), -- Password: admin

@@ -10,14 +10,14 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({ secret: 'your-secret-key', resave: true, saveUninitialized: true }));
+app.use(session({ secret: 'uominiseksi', resave: true, saveUninitialized: true }));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 const jwt = require('jsonwebtoken');
 const { createSecretKey } = require('crypto');
 const db = new sqlite3.Database('users.db');
 const dbFolderPath = path.join(__dirname, 'db');
 const usersDbPath = path.join(dbFolderPath, 'users.db');
-const secretKey = 'your-secret-key';
+const secretKey = 'uominiseksi';
 const router = express.Router();
 
 const initDb = () => {
@@ -77,9 +77,10 @@ router.post('/login', (req, res) => {
         // Successful login
         // Creare un token JWT utilizzando l'ID dell'utente come parte dei dati da firmare
         const userId = row.id;
-        const token = jwt.sign({ userId }, 'your-secret-key', { expiresIn: '1h' });
+        const username = req.body.username;
+        const token = jwt.sign({ userId }, secretKey, { expiresIn: '1h' });
 
-        res.status(200).json({ message: 'Login successful', redirect: '/welcome', token });
+        res.status(200).json({ message: 'Login successful', redirect: '/welcome', token, username });
       } else {
         res.status(401).send('Authentication Failed');
       }
@@ -179,9 +180,62 @@ router.get('/welcome', (req, res) => {
   });
 });
 
+function generateProductListHTML(products) {
+  let productListHTML = '';
 
+  products.forEach(product => {
+    productListHTML += `<div class="cart-item">
+                          <p>Nome: ${product.name}</p>
+                          <p>Quantità: ${product.quantity}</p>
+                          <p>Prezzo: ${product.price}</p>
+                        </div>`;
+  });
+
+  return productListHTML;
+}
 
 router.get('/carrello', (req, res) => {
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token mancante' });
+  }
+
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ error: 'Token non valido' });
+    }
+
+    const userId = decoded.username;
+    const query = 'SELECT * FROM user_cart WHERE user_username = ?';
+
+    db.all(query, [userId], (dbErr, rows) => {
+      if (dbErr) {
+        console.error(dbErr);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
+
+      const userMessage = `Benvenuto nel carrello, ${userId || 'Visitatore'}!`;
+      const productListHTML = generateProductListHTML(rows);
+
+      // Restituisci solo i dati JSON senza HTML
+      res.status(200).send({
+        message: userMessage,
+        products: rows,
+        productListHTML: productListHTML
+      });
+    });
+  });
+});
+
+
+// Funzione per generare l'HTML della lista dei prodotti
+
+
+
+
+
+/*router.get('/carrello', (req, res) => {
   const token = req.header('Authorization');
 
   if (!token) {
@@ -208,8 +262,36 @@ router.get('/carrello', (req, res) => {
       res.status(200).send(renderedHTML);
     });
   });
-});
+});*/
 
+
+router.post('/aggiungi-al-carrello', (req, res)=>{
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).send('Token mancante');
+  }
+
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).send('Token non valido');
+    }
+  const userId = decoded.username; // ID dell'utente autenticato
+  const productId = req.body.productId; // ID del prodotto da aggiungere al carrello
+  console.log(userId, "\n", productId);
+
+    // Esempio di query per inserire il prodotto nel carrello
+    db.run('INSERT INTO user_cart (user_username, external_product_id, quantity) VALUES (?, ?, 1)', [userId, productId], function(err) {
+      if (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Errore durante l\'aggiunta al carrello' });
+      } else {
+        res.status(200).json({ message: 'Prodotto aggiunto al carrello con successo' });
+      }
+    });
+  });
+
+});
 
 router.get('/supermercato', (req, res) => {
   const token = req.header('Authorization');

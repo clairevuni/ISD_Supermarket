@@ -1,14 +1,17 @@
 // Recupera il carrello dal local storage
-const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
 
 // Funzione per inserire dinamicamente gli elementi nella lista del carrello
-function insertCartItems() {
+/*function insertCartItems() {
   const cartContainer = document.getElementById('cartContainer');
 
   // Popola la lista del carrello
   cart.forEach(item => {
     const cartItem = document.createElement('div');
     cartItem.classList.add('cart-item');
+
+    const itemId = document.createElement('p');
+    itemId.textContent = `Nome: ${item.id}`;
 
     const itemName = document.createElement('p');
     itemName.textContent = `Nome: ${item.name}`;
@@ -20,6 +23,7 @@ function insertCartItems() {
     itemPrice.textContent = `Prezzo: ${item.price}`;
 
     // Aggiungi gli elementi alla lista del carrello
+    cartItem.appendChild(itemId);
     cartItem.appendChild(itemName);
     cartItem.appendChild(itemQuantity);
     cartItem.appendChild(itemPrice);
@@ -33,20 +37,7 @@ addToCartButtons.forEach(button => {
   button.addEventListener('click', addToCart);
 });
 
-// Funzione per gestire l'aggiunta al carrello
-async function addToCart(event) {
-  // Recupera l'id del prodotto dal bottone cliccato
-  const productId = event.target.dataset.productId;
 
-  // Effettua la richiesta al server per aggiungere il prodotto al carrello
-  try {
-    const response = await axios.post('/aggiungi-al-carrello', { productId });
-    alert(response.data.message);  // Mostra un messaggio di successo
-  } catch (error) {
-    console.error(error);
-    alert('Errore durante l\'aggiunta al carrello');  // Mostra un messaggio di errore
-  }
-}
 
   // Funzione per svuotare il carrello
   function emptyCart() {
@@ -71,4 +62,78 @@ async function addToCart(event) {
 }
 
 // Chiamata alla funzione per inserire gli elementi nel carrello
-insertCartItems();
+insertCartItems();*/
+
+// Recupera il carrello dal local storage
+//const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+// Funzione per inserire dinamicamente gli elementi nella lista del carrello
+// Rimuovi la funzione insertCartItems attuale
+
+// Aggiungi questa funzione per ottenere i prodotti del carrello
+
+const cartContainer = document.getElementById('cartContainer');
+
+function generateHTMLFromJSON(jsonData) {
+  let html = '';
+
+  // Verifica se il JSON contiene una chiave "products"
+  if (jsonData.products && Array.isArray(jsonData.products)) {
+    // Itera su ciascun prodotto nel JSON e genera HTML
+    jsonData.products.forEach(product => {
+      html += 
+        <div class="product">
+          <h2>${product.name}</h2>
+          <p>Prezzo: ${product.price}</p>
+          <p>Quantità: ${product.quantity}</p>
+        </div>
+      ;
+    });
+  } else {
+    // Messaggio di errore se la struttura del JSON non è come atteso
+    html = '<p>Errore: Struttura JSON non valida o dati mancanti.</p>';
+  }
+
+  return html;
+}
+
+// Funzione per ottenere i prodotti nel carrello dal server
+function getCartProducts() {
+  const token = getToken();
+
+  fetch('http://localhost:4000/users/carrello', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Errore nella richiesta');
+    }
+    return response.json();
+  })
+  .then(data => {
+    const productListHTML = generateHTMLFromJSON(data);
+    cartContainer.innerHTML = productListHTML;
+  })
+  .catch(error => {
+    console.error(error);
+  });
+}
+
+// Chiamata alla funzione per ottenere gli elementi nel carrello
+getCartProducts();
+
+// Funzione per ottenere il token dal cookie
+function getToken() {
+  const cookies = document.cookie.split(';');
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name.trim() === 'token') {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
+}

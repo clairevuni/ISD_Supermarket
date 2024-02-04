@@ -13,26 +13,11 @@
     <p></p>
     <h3><!--#welcome-user--></h3>
     <div id="actionButtons">
-      <button id="openModalButton">Aggiungi Prodotti</button>
-      <a class="dropdown-item" href="/logout">Logout</a>
-    </div>
-
-    <div class="modal" id="myModal">
-      <form action="/save-product" method="POST">
-        <label for="productName">Nome Prodotto:</label>
-        <input type="text" id="productName" name="productName">
-        <label for="productCategory">Categoria:</label>
-        <input type="text" id="productCategory" name="productCategory">
-        <label for="productPrice">Prezzo:</label>
-        <input type="text" id="productPrice" name="productPrice">
-        <label for="productDescription">Descrizione:</label>
-        <textarea id="productDescription" name="productDescription"></textarea>
-        <button id="saveProductButton">Salva Prodotto</button>
-      </form>
+      <a class="dropdown-item" href="/aggiungiprodotti">Add Products</a>
+      <a class="dropdown-item3" href="/supermercatoS">SuperMarkets</a>
+      <a class="dropdown-item2" href="/logout">Logout</a>
     </div>
   </div>
-
-  <script src="modal.js"></script>
 </body>
 
 </html>
