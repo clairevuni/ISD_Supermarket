@@ -3,7 +3,7 @@ const cartCount = JSON.parse(localStorage.getItem('cart'))?.length || 0;
 
 const cartIcon = document.createElement('div');
 cartIcon.style = 'position: fixed; top: 10px; right: 10px; cursor: pointer;';
-cartIcon.innerHTML = `<i class="fas fa-shopping-cart"></i> <span>${cartCount}</span>`;
+cartIcon.innerHTML = `<i class="fas fa-shopping-cart"></i> <span></span>`;
 
 cartIcon.addEventListener('click', () => {
   window.location.href = '/carrello';
@@ -20,8 +20,6 @@ function insertProducts(products) {
     card.classList.add('product-card');
 
     const image = document.createElement('img');
-    image.src = product.image; 
-    image.alt = product.name;
 
     const name = document.createElement('h3');
     name.textContent = product.name;
@@ -30,10 +28,10 @@ function insertProducts(products) {
     productId.textContent = `ID: ${product.id}`;
 
     const price = document.createElement('p');
-    price.textContent = `Prezzo: ${product.price}`;
+    price.textContent = `Price: ${product.price}`;
 
     const addToCartButton = document.createElement('button');
-    addToCartButton.textContent = 'Aggiungi al Carrello';
+    addToCartButton.textContent = 'Add to Cart';
 
     addToCartButton.addEventListener('click', () => {
       console.log(`Prodotto aggiunto al carrello: ${product.name} - ID: ${product.id}`);
@@ -52,6 +50,9 @@ function insertProducts(products) {
     productsContainer.appendChild(card);
   });
 }
+
+
+
 
 function getToken() {
   const cookies = document.cookie.split(';');

@@ -18,7 +18,6 @@ const cors = require('cors');
 const secretKey = 'uominiseksi';
 const rateLimit = require('express-rate-limit');
 app.use(cookieParser());
-app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/public', express.static(path.join(__dirname, 'public')));
@@ -28,6 +27,7 @@ app.use('/public/*.js', (req, res, next) => {
   res.type('application/javascript');
   next();
 });
+
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'http://localhost:3000');

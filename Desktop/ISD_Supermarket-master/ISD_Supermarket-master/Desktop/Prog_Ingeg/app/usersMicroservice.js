@@ -188,19 +188,119 @@ router.get('/carrello', (req, res) => {
         return res.status(500).send('<p>Error: Internal Server Error!!!</p>');
       }
 
-      const userMessage = `Benvenuto nel carrello, ${userId || 'Visitatore'}!`;
+      const userMessage = `Welcome to the cart, ${userId || 'Visitatore'}!`;
       const productListHTML = generateProductListHTML(rows);
 
       const html = `
-        <html>
-          <head>
-            <!-- Eventuali intestazioni -->
-          </head>
-          <body>
-            <div>${userMessage}</div>
-            ${productListHTML}
-          </body>
-        </html>
+      <html>
+    <head>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #DFD5A5;
+        }
+        #cartContainer {
+          border: 1px solid #ccc;
+          padding: 10px;
+          margin: 20px;
+          background-color: #fff;
+        }
+        .product {
+          border-bottom: 1px solid #eee;
+          padding: 10px;
+          margin-bottom: 10px;
+          background-color: #fff; 
+          color: #000; 
+          border-radius: 8px; 
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        div {
+          color: #000; /* Colore del testo per lo userMessage */
+          font-size: 20px;
+          text-align: center;
+          padding: 10px; 
+          margin-bottom: 20px;
+          border-radius: 8px; 
+          font-family: "Times New Roman", Times, serif;
+        }
+        #userMessage{
+          color: #000; /* Colore del testo per lo userMessage */
+          font-size: 30px;
+          text-align: center;
+          padding: 10px; 
+          margin-bottom: 20px;
+          border-radius: 8px; 
+          font-family: "Times New Roman", Times, serif;
+
+        }
+        button {
+          margin-top: 20px;
+          padding: 10px 20px;
+          font-size: 16px;
+          color: #fff;
+          border: none;
+          cursor: pointer;
+          transition: background-color 0.3s;
+          width: 100%;
+          outline: none;
+        }
+        
+        button:hover {
+          background-color: #FF9897;
+        }
+        
+        .button-container {
+          display: flex;
+          justify-content: space-around;
+          margin-top: 20px;
+          width: 100%;
+        }
+        
+        .button {
+          text-align: center;
+          text-decoration: none;
+          padding: 10px 20px;
+          font-size: 16px;
+          color: #fff;
+          border: none;
+          cursor: pointer;
+          border-radius: 5px;
+          transition: background-color 0.3s;
+        }
+        
+        .button.welcome {
+          background-color: #F4AA15;
+        }
+        
+        .button.supermercato {
+          background-color: #547035;
+        }
+        
+        .button.logout {
+          background-color: #CC4A18;
+        }
+        
+        .button:hover {
+          background-color: #C5CEC1;
+        }
+        
+        </style>
+      
+    </head>
+    <body>
+
+      <div>${userMessage}</div>
+      <div class="button-container">
+        <a class="button welcome" href="/welcome">Go Back</a>
+        <a class="button supermercato" href="/supermercato">SuperMarket</a>
+         <a class="button logout" href="logout">Logout</a>
+  </div>
+  
+      ${productListHTML}
+
+    </body>
+
+  </html>
       `;
       res.status(200).send(html);
     });

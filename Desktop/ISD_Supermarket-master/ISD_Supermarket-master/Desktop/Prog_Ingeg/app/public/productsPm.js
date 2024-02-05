@@ -24,8 +24,6 @@ function insertProducts(products, username) {
     card.classList.add('product-card');
 
     const image = document.createElement('img');
-    image.src = product.image;
-    image.alt = product.name;
 
     const name = document.createElement('h3');
     name.textContent = product.name;

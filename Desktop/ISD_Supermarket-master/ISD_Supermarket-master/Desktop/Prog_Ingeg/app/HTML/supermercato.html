@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SuperMarket</title>
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' kit.fontawesome.com">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="SHA-384-tuoiNuoviCaratteriIntegrity" crossorigin="anonymous">
-
-    <style>
+     <style>
         body {
             font-family: 'Arial', sans-serif;
             background-color: #768C53;
@@ -110,10 +107,11 @@
 </head>
 <body>
     <h1>This is the SuperMarket!</h1>
-    <div style="position: fixed; top: 5px; right: 10px;" id="cartIcon"></div>
-    <div style="position: fixed; top: 55px; right: 10px;">
+    <button style="position: absolute; top: 5px; right: 10px; font-size: 30px; cursor: pointer; background: none; border: none;" onclick="window.location.href='/carrello'">&#128722;</button>
+
+    <div style="position: absolute; top: 55px; right: 10px;">
         <a class="menu-button" href="/welcome">
-            <i class="fas fa-bars"></i> go bak to menu
+            <i class="fas fa-bars"></i> go back to menu
         </a>
     </div>
     <div id="supermercatoMessage" style="color: #000000; text-align: center; margin: 20px;">
