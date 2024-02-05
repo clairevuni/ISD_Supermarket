@@ -38,7 +38,7 @@ function insertProducts(products) {
     addToCartButton.addEventListener('click', () => {
       console.log(`Prodotto aggiunto al carrello: ${product.name} - ID: ${product.id}`);
       console.log('Token prima di addToCart:', getToken());
-      addToCart(product.id);
+      addToCart(product.id, product.name);
       
     });
 
@@ -71,17 +71,24 @@ function getToken() {
 
 
 
-function addToCart(productId, callback) {
-  const token = getToken(); 
+function addToCart(productId, name, callback) {
+  const token = getToken();
+  const formData = new FormData();
+  formData.append('productId', productId);
+  formData.append('name', name);
+ 
   //console.log(token);
   if (token) {
     fetch('http://localhost:3000/aggiungi-al-carrello', {
       method: 'POST',
       headers: {
-        'Content-Type': 'text/html',
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({ productId })
+      body: JSON.stringify({
+        productId,
+        name
+      })
     })
       .then(response => response.json())
       .then(data => {

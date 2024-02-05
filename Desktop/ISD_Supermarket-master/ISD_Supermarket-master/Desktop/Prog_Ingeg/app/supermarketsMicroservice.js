@@ -153,7 +153,7 @@ router.get('/supermarket-welcome', (req, res) => {
     return res.status(401).send('Token mancante');
   }
 
-  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {  // Rimuovi il "Bearer" dal token
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => { 
     if (err) {
       return res.status(401).send('Token non valido');
     }

@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS user_cart (
   external_product_id INTEGER,
   external_product_database TEXT,
   quantity INTEGER,
+  productName TEXT,
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
