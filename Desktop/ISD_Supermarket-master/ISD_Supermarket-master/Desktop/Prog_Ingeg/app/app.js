@@ -54,8 +54,8 @@ app.get('/', (req, res) => {
       res.status(500).send('Internal Server Error');
     } else {
       res.status(200).send(data);
-    }
-  });
+    }
+  });
 });
 
 // Route del microservizio degli user
@@ -75,7 +75,6 @@ app.post('/login', registrationLimiter, (req, res) => {
   axios.post('http://localhost:4000/users/login', { username, password })
     .then(response => {
       if (response.status === 200) {
-        // Generiamo un token JWT con un id dell'utente
         const userId = response.data.userId;
         const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
         // il token va nei cookie!!
@@ -116,7 +115,7 @@ app.get('/welcome', authenticateToken, (req, res) => {
   });
 });
 
-app.get('/aggiungi-al-carrello', authenticateToken2, (req, res) => {
+app.get('/aggiungi-al-carrello', authenticateToken, (req, res) => {
   const token = req.cookies['token'];
 
   jwt.verify(token, secretKey, (err, decoded) => {
@@ -200,7 +199,7 @@ app.get('/carrello', authenticateToken, (req, res) => {
     })
     .catch(error => {
       console.error(error);
-      res.status(500).send('Internal Server Error');
+      res.status(500).send('Internal Server Error£££');
     });
     //console.log(username);
 });
@@ -225,23 +224,7 @@ function authenticateToken(req, res, next) {
   });
 }
 
-//questa prende lo username (anche se ho dubbi)
-function authenticateToken2(req, res, next) {
-  const token = req.query['token'];
-  console.log(token);
-  if (!token) {
-    return res.status(401).json({ error: 'Token mancante' });
-  }
 
-  jwt.verify(token, secretKey, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ error: 'Token non valido' });
-    }
-
-    req.user = {username: decoded.username};
-    next();
-  });
-}
 
 app.get('/supermercato', authenticateToken, (req, res) => {
   const token = req.cookies['token'];
@@ -286,24 +269,7 @@ app.post('/aggiungi-al-carrello', authenticateToken, (req, res) => {
 
 
 
-// Route del microservizio dei supermercati!!
 
-function authenticateSupermarketToken(req, res, next) {
-  const token = req.query['token'];
-
-  if (!token) {
-    return res.status(401).json({ error: 'Token supermercato mancante' });
-  }
-
-  jwt.verify(token, secretKey, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ error: 'Token supermercato non valido' });
-    }
-
-    req.supermarket = { username: decoded.username, role: 'supermarket' };
-    next();
-  });
-}
 
 app.get('/login-supermarket', (req, res) => {
   axios.get('http://localhost:4000/supermarkets/login-supermarket', {params: req.body})
@@ -316,24 +282,52 @@ app.get('/login-supermarket', (req, res) => {
     });
 });
 
-app.post('/login-supermarket', registrationLimiter, (req, res) => {
+app.post('/login-supermarket', (req, res) => {
   const { username, password } = req.body;
+
   axios.post('http://localhost:4000/supermarkets/login-supermarket', { username, password })
     .then(response => {
       if (response.status === 200) {
-        // Crea token jwt che expira in 1h
         const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
-
-        const redirectUrl = `${response.data.redirect}?token=${token}`;
-        
+        // il token va nei cookie!!
+        res.cookie('token', token, { httpOnly: false, secure: true });
+        const redirectUrl = response.data.redirect;
         res.redirect(redirectUrl);
       }
     })
     .catch(error => {
       console.error(error);
-      res.status(500).json({ error: 'HELP' });
+      res.status(500).json({ error: 'Internal Server Error' });
     });
 });
+
+app.get('/supermarket-welcome', authenticateToken, (req, res) => {
+  const token = req.cookies['token'];
+
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ error: 'Token non valido' });
+    }
+
+    axios.get('http://localhost:4000/supermarkets/supermarket-welcome', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        username: decoded.username,
+      },
+    })
+    .then(response => {
+      res.status(response.status).send(response.data);
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).send('Non funziona amen');
+    });
+  });
+});
+
+
 
 app.get('/register-supermarket', (req, res) => {
   axios.get('http://localhost:4000/supermarkets/register-supermarket')
@@ -387,42 +381,10 @@ app.get('/supermercatoS', (req, res) => {
     })
     .catch(error => {
       console.error(error);
-      res.status(500).send('Internal Server Error8');
+      res.status(500).send('Internal Server Error');
     });
 });
 
-
-app.get('/supermarket-welcome', authenticateSupermarketToken, (req, res) => {
-  const token = req.query.token;
-  console.log(token);
-
-  if (!token) {
-    return res.status(401).json({ error: 'Token mancante' });
-  }
-
-
-  jwt.verify(token, secretKey, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ error: 'Token non valido' });
-    }
-
-    axios.get('http://localhost:4000/supermarkets/supermarket-welcome', {
-      headers: {
-        Authorization: `Bearer ${token}`, 
-      },
-      params: {
-        username: decoded.username,
-      },
-    })
-    .then(response => {
-      res.status(response.status).send(response.data);
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).send('Internal Server Error3');
-    });
-  });
-});
 
 app.get('/register-supermarket', (req, res) => {
   axios.get('http://localhost:4000/supermarkets/register-supermarket')
@@ -441,6 +403,7 @@ app.get('/register-supermarket', (req, res) => {
 app.post('/save-product', async (req, res) => {
   try {
     const username = req.query.username;
+    console.log(username);
     const { productName, productCategory, productPrice, productDescription } = req.body;
 
     const productsMicroserviceEndpoint = 'http://localhost:4000/supermarkets/save-product';
@@ -465,6 +428,9 @@ app.post('/save-product', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+
 
 app.get('/get-products', async (req, res) => {
   try {
@@ -504,5 +470,3 @@ app.get('/aggiungiprodotti', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Main app running at http://localhost:${PORT}/`);
 });
-
-

@@ -34,6 +34,17 @@ const initDb = () => {
 
 initDb();
 
+/*router.get('/menu', (req, res) => {
+  const filePath = path.join(__dirname, 'HTML', 'menu.html');
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      res.status(500).send('Internal Server Error');
+    } else {
+      res.status(200).send(data);
+    }
+  });
+});*/
+
 
 
 router.get('/login', (req, res) => {
@@ -44,7 +55,7 @@ router.get('/login', (req, res) => {
 router.post('/login', (req, res) => {
   const { username, password } = req.body;
 
-  const query = 'SELECT id, username, password FROM users WHERE username = ?';
+  const query = 'SELECT * FROM users WHERE username = ?';
 
   db.get(query, [username], (err, row) => {
     if (err) {
@@ -63,6 +74,8 @@ router.post('/login', (req, res) => {
       }
 
       if (bcryptResult) {
+        // Successful login
+        // Creare un token JWT utilizzando l'ID dell'utente come parte dei dati da firmare
         const userId = row.id;
         const username = req.body.username;
         const token = jwt.sign({ userId }, secretKey, { expiresIn: '1h' });
@@ -74,7 +87,6 @@ router.post('/login', (req, res) => {
     });
   });
 });
-
 
 router.get('/register', (req, res) => {
   const filePath = path.join(__dirname, 'HTML', 'register.html');
@@ -134,19 +146,23 @@ router.post('/register', [
 });
 
 router.get('/welcome', (req, res) => {
+  const { username } = req.query;
+
+  // Verificare il token nell'header della richiesta
   const token = req.header('Authorization');
 
   if (!token) {
     return res.status(401).send('Token mancante');
   }
 
-  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {
+  // Verificare e decodificare il token
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {  // Rimuovi il "Bearer" dal token
     if (err) {
       return res.status(401).send('Token non valido');
     }
 
+    // L'utente è autenticato, puoi procedere con la risposta personalizzata
     const filePath = path.join(__dirname, 'HTML', 'welcome.html');
-    
     fs.readFile(filePath, 'utf8', (readErr, data) => {
       if (readErr) {
         console.error(readErr);
@@ -154,15 +170,14 @@ router.get('/welcome', (req, res) => {
       }
 
       const welcomeMessage = `Welcome, ${decoded.username || 'Guest'}!`;
+      const renderedHTML = data.replace('<!--#welcome-message-->', welcomeMessage);
+
       const userWelcomeMessage = decoded.username
-        ? `Welcome, ${decoded.username}! What are we doing today?`
+        ? `Welcome, ${decoded.username}! What we are doing today?`
         : 'Welcome, Guest!';
+      const userRenderedHTML = renderedHTML.replace('<!--#welcome-user-->', userWelcomeMessage);
 
-      const renderedHTML = data
-        .replace('<!--#welcome-message-->', welcomeMessage)
-        .replace('<!--#welcome-user-->', userWelcomeMessage);
-
-      res.status(200).send(renderedHTML);
+      res.status(200).send(userRenderedHTML);
     });
   });
 });
@@ -199,13 +214,13 @@ router.get('/carrello', (req, res) => {
     db.all(query, [userId], (dbErr, rows) => {
       if (dbErr) {
         console.error(dbErr);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(500).json({ error: 'Internal Server Error!!!' });
       }
 
       const userMessage = `Benvenuto nel carrello, ${userId || 'Visitatore'}!`;
       const productListHTML = generateProductListHTML(rows);
 
-      // Restituisci solo i dati JSON senza HTML->da capire perché non funziona
+      // Restituisci solo i dati JSON senza HTML
       res.status(200).send({
         message: userMessage,
         products: rows,
@@ -214,6 +229,42 @@ router.get('/carrello', (req, res) => {
     });
   });
 });
+
+
+// Funzione per generare l'HTML della lista dei prodotti
+
+
+
+
+
+/*router.get('/carrello', (req, res) => {
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).send('Token mancante');
+  }
+
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).send('Token non valido');
+    }
+
+    // Esegui le operazioni specifiche del carrello e restituisci la risposta al server principale
+    const filePath = path.join(__dirname, 'HTML', 'carrello.html');
+    fs.readFile(filePath, 'utf8', (readErr, data) => {
+      if (readErr) {
+        console.error(readErr);
+        return res.status(500).send('Internal Server Error');
+      }
+
+      // Personalizza la risposta in base all'utente autenticato
+      const userMessage = `Benvenuto nel carrello, ${decoded.username || 'Visitatore'}!`;
+      const renderedHTML = data.replace('<!--#carrello-message-->', userMessage);
+
+      res.status(200).send(renderedHTML);
+    });
+  });
+});*/
 
 
 router.post('/aggiungi-al-carrello', (req, res)=>{
@@ -227,10 +278,11 @@ router.post('/aggiungi-al-carrello', (req, res)=>{
     if (err) {
       return res.status(401).send('Token non valido');
     }
-  const userId = decoded.username; 
-  const productId = req.body.productId; 
+  const userId = decoded.username; // ID dell'utente autenticato
+  const productId = req.body.productId; // ID del prodotto da aggiungere al carrello
   console.log(userId, "\n", productId);
 
+    // Esempio di query per inserire il prodotto nel carrello
     db.run('INSERT INTO user_cart (user_username, external_product_id, quantity) VALUES (?, ?, 1)', [userId, productId], function(err) {
       if (err) {
         console.error(err);
@@ -244,45 +296,19 @@ router.post('/aggiungi-al-carrello', (req, res)=>{
 });
 
 router.get('/supermercato', (req, res) => {
-  const token = req.header('Authorization');
-
-  if (!token) {
-    return res.status(401).send('Token mancante');
-  }
-
-  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {
-    if (err) {
-      return res.status(401).send('Token non valido');
-    }
-
-    const filePath = path.join(__dirname, 'HTML', 'supermercato.html');
-    fs.readFile(filePath, 'utf8', (readErr, data) => {
-      if (readErr) {
-        console.error(readErr);
-        return res.status(500).send('Internal Server Error');
-      }
-
-      const userMessage = `Benvenuto al supermercato, ${decoded.username || 'Visitatore'}!`;
-      const renderedHTML = data.replace('<!--#supermercato-message-->', userMessage);
-
-      res.status(200).send(renderedHTML);
-    });
-  });
+  const filePath = path.join(__dirname, 'HTML', 'supermercato.html');
+  res.sendFile(filePath);
 });
+
 
 router.get('/logout', (req, res) => {
   try {
+    // Azioni di logout necessarie
     res.redirect('/');
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error!!' });
   }
 });
-
-
-
-
-
-
 
 module.exports = router;

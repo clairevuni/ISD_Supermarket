@@ -33,6 +33,19 @@ const initSupermarketsDb = () => {
 
 initSupermarketsDb();
 
+const initProductsDb = () => {
+  const initProductsDbScript = fs.readFileSync(path.join(__dirname, 'db', 'init-products-db.sql'), 'utf8');
+
+  dbSupermarkets.run(initProductsDbScript, function (err) {
+    if (err) {
+      console.error('Error initializing products database:', err);
+    } else {
+      console.log('Products database initialized successfully.');
+    }
+  });
+};
+initProductsDb();
+
 
 
 router.get('/login-supermarket', (req, res) => {
@@ -73,7 +86,7 @@ router.post('/register-supermarket', [
     dbSupermarkets.get(checkSupermarketQuery, [username], (err, existingSupermarket) => {
       if (err) {
         console.error(err);
-        return res.status(500).send('Internal Server Erroracci');
+        return res.status(500).send('Internal Server Error');
       } else if (existingSupermarket) {
         return res.status(400).send('Supermarket already exists');
       } else {
@@ -83,7 +96,7 @@ router.post('/register-supermarket', [
         dbSupermarkets.run(insertSupermarketQuery, [username, hash], insertErr => {
           if (insertErr) {
             console.error(insertErr);
-            return res.status(500).send('Internal Server Erroracci');
+            return res.status(500).send('Internal Server Error');
           } else {
             const redirectUrl = '/login-supermarket';
             res.status(200).json({ message: 'Registration successful', redirect: redirectUrl });
@@ -106,7 +119,7 @@ router.post('/login-supermarket', (req, res) => {
   dbSupermarkets.get(query, [username], (err, row) => {
     if (err) {
       console.error(err);
-      return res.status(500).send('Internal Server Errorpipo');
+      return res.status(500).send('Internal Server Error');
     }
 
     if (!row) {
@@ -120,10 +133,10 @@ router.post('/login-supermarket', (req, res) => {
       }
 
       if (bcryptResult) {
-
+        const username = req.body.username;
         const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
 
-        res.status(200).json({ message: 'Login successful', redirect: '/supermarket-welcome', token });
+        res.status(200).json({ message: 'Login successful', redirect: '/supermarket-welcome', token, username });
       } else {
         res.status(401).send('Authentication Failed');
       }
@@ -140,7 +153,7 @@ router.get('/supermarket-welcome', (req, res) => {
     return res.status(401).send('Token mancante');
   }
 
-  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => { 
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {  // Rimuovi il "Bearer" dal token
     if (err) {
       return res.status(401).send('Token non valido');
     }
@@ -166,18 +179,6 @@ router.get('/supermarket-welcome', (req, res) => {
 });
 
 
-const initProductsDb = () => {
-  const initProductsDbScript = fs.readFileSync(path.join(__dirname, 'db', 'init-products-db.sql'), 'utf8');
-
-  dbSupermarkets.run(initProductsDbScript, function (err) {
-    if (err) {
-      console.error('Error initializing products database:', err);
-    } else {
-      console.log('Products database initialized successfully.');
-    }
-  });
-};
-initProductsDb();
 
 router.get('/supermercatoS', (req, res) => {
   const token = req.header('Authorization');
@@ -225,11 +226,12 @@ router.get('/aggiungiprodotti', (req, res) => {
   });
 });
 
+
 router.post('/save-product', (req, res) => {
   const { supermarketName } = req.params;
   const { productName, productCategory, productPrice, productDescription } = req.body;
 
-  const insertProductQuery = 'INSERT INTO supermarket_products (name, category, price, description) VALUES (?, ?, ?, ?)';
+  const insertProductQuery = 'INSERT INTO supermarket_products (name, category, price, description, supermarket_name) VALUES (?, ?, ?, ?, ?)';
 
   dbSupermarkets.run('BEGIN TRANSACTION');
 
