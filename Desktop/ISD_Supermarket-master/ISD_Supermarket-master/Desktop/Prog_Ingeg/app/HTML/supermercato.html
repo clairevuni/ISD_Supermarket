@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supermercato</title>
+    <title>SuperMarket</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' kit.fontawesome.com">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="SHA-384-tuoiNuoviCaratteriIntegrity" crossorigin="anonymous">
 
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #bd6262;
+            background-color: #768C53;
             margin: 0;
             padding: 0;
             display: flex;
@@ -24,8 +24,6 @@
             text-align: center;
             margin: 16px;
         }
-
-        /* Stile migliorato per le card dei prodotti */
         .product-card {
             border: 1px solid #ddd;
             padding: 16px;
@@ -69,7 +67,7 @@
         }
 
         .add-to-cart-button:hover {
-            background-color: #45a049;
+            background-color: #FF9897;
         }
 
         .navigation-buttons {
@@ -79,7 +77,7 @@
         }
 
         .cart-button, .cart-count-button {
-            background-color: #4caf50;
+            background-color: #FF9897;
             color: #fff;
             border: none;
             padding: 8px 16px;
@@ -89,11 +87,11 @@
         }
 
         .cart-button:hover, .cart-count-button:hover {
-            background-color: #45a049;
+            background-color: #FF9897;
         }
 
         .menu-button {
-            background-color: #88d08a;
+            background-color: #FF9897;
             color: #fff;
             border: none;
             padding: 3px 10px;
@@ -105,18 +103,17 @@
         }
 
         .menu-button:hover {
-            background-color: #8aae8c;
+            background-color: #FF9897;
         }
 
     </style>
-    <script src="js.cookie.min.js"></script>
 </head>
 <body>
-    <h1>Benvenuto al Supermercato</h1>
+    <h1>This is the SuperMarket!</h1>
     <div style="position: fixed; top: 5px; right: 10px;" id="cartIcon"></div>
     <div style="position: fixed; top: 55px; right: 10px;">
         <a class="menu-button" href="/welcome">
-            <i class="fas fa-bars"></i> Ritorna al Menu
+            <i class="fas fa-bars"></i> go bak to menu
         </a>
     </div>
     <div id="supermercatoMessage" style="color: #000000; text-align: center; margin: 20px;">

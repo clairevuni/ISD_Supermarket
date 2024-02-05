@@ -1,19 +1,17 @@
-<!-- login-supermarket.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/STYLE/styleS.css">
+  <link rel="stylesheet" href="/STYLE/style-login.css">
 
-  <title>Login Supermercato</title>
+  <title>Login SuperMarket</title>
 </head>
 
 <body>
-  <h2>Login Supermercato</h2>
-
+  <div class="container">
+    <h2>Login SuperMarket</h2>
   <form action="/login-supermarket" method="post">
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" required>
@@ -21,10 +19,10 @@
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" required>
 
-    <button type="submit">Login</button>
+    <input type="submit" value="Login">
   </form>
   <p>Don't have an account? <a href="/register-supermarket">Register</a></p>
-  <p>Vuoi tornare indietro? <a href="/">Menu</a></p>  
+  <p>Want to go back? <a href="/">Menu</a></p>  
 </div>
   <script src="app.js"></script>
 </body>

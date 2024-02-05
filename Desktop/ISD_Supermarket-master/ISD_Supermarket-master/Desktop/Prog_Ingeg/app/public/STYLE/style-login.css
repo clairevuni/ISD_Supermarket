@@ -1,8 +1,8 @@
-/* style-login.css */
+
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #000;
+    background-color: #EEE9D5;
     color: #fff;
     margin: 0;
     padding: 0;
@@ -13,16 +13,16 @@ body {
   }
   
   .container {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: #547036;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-    width: 300px; /* Regola la larghezza del contenitore del form */
+    width: 300px;
   }
   
   h2 {
     text-align: center;
-    color: #fff;
+    color: #1E2A11;
   }
   
   form {
@@ -44,7 +44,7 @@ body {
   }
   
   input[type="submit"] {
-    background-color: #4caf50;
+    background-color: #758B52;
     color: white;
     cursor: pointer;
     border: none;
@@ -54,6 +54,13 @@ body {
   }
   
   input[type="submit"]:hover {
-    background-color: #45a049;
+    background-color: #758B52;
   }
   
+  p{
+    color: black;
+  }
+
+  a{
+    color: #EEE9D5;
+  }

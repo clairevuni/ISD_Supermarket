@@ -11,27 +11,21 @@
 
 <body>
   <header>
-    <h1>Your Virtual Cart</h1>
     <div id="carrelloMessage" style="color: #000000; text-align: center; margin: 20px;">
       <h3 id="carrello-message"><!--#carrello-message--></h3>
     </div>
-    <button class="checkout-button"><a href="/checkout">Checkout</a></button>
   </header>
 
   <div class="button-container">
-    <div class="button">
-      <button><a href="/welcome">&#8592;</a></button>
-    </div>
-    <div class="button">
-      <button><a href="/supermercato">SuperMarket</a></button>
-    </div>
+    <a class="button welcome" href="/welcome">Go Back</a>
+    <a class="button supermercato" href="/supermercato">SuperMarket</a>
+    <a class="button logout" href="logout">Logout</a>
   </div>
 
-  <h2>Contenuto del Carrello</h2>
+  <h2>Items in your cart</h2>
   <div id="cartContainer"></div>
   <button id="emptyCartButton" style="color: black; ">Clear Cart</button>
 
-  <a class="logout-link" href="/logout">Logout</a>
 
   <script src="carrello.js"></script>
 </body>

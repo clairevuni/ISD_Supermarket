@@ -50,16 +50,16 @@ h2, h3 {
 }
 
 .button.carrello {
-  background-color: #4c7faf;
+  background-color: #F4AA15;
 }
 
 .button.supermercato {
-  background-color: #ff9800;
+  background-color: #517033;
 }
 
 .button.logout {
-  background-color: #f4429e;
+  background-color: #CC4A18;
 }
 .button.logout:hover {
-  background-color: #d92a96;
+  background-color: #FDB64C;
 }
