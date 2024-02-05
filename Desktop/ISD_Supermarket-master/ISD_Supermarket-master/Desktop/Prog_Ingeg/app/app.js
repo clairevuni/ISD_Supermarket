@@ -248,6 +248,7 @@ app.post('/aggiungi-al-carrello', authenticateToken, (req, res) => {
   const token = req.cookies['token'];
   const productId = req.body.productId;
   const productName = req.body.name;
+  console.log(productId, productName);
 
   axios.post(
     'http://localhost:4000/users/aggiungi-al-carrello',

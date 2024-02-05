@@ -250,7 +250,7 @@ router.post('/aggiungi-al-carrello', (req, res)=>{
     }
   const userId = decoded.username; 
   const productId = req.body.productId; 
-  const productName = req.body.name;
+  const productName = req.body.productName;
   console.log(userId, "\n", productId, "\n", productName);
 
     db.run('INSERT INTO user_cart (user_username, external_product_id, quantity, productName) VALUES (?, ?, 1, ?)', [userId, productId, productName], function(err) {
