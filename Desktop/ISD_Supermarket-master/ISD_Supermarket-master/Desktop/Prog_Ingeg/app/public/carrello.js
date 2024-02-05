@@ -90,7 +90,7 @@ function getCartProducts() {
     });
 }
 
-// Funzione per svuotare il carrello
+
 function emptyCart() {
   const cartContainer = document.getElementById('cartContainer');
   cartContainer.innerHTML = '<p>Nessun prodotto nel carrello.</p>';
@@ -99,5 +99,4 @@ function emptyCart() {
 const emptyCartButton = document.getElementById('emptyCartButton');
 emptyCartButton.addEventListener('click', emptyCart);
 
-// Chiamata iniziale alla funzione per ottenere gli elementi nel carrello
 getCartProducts();

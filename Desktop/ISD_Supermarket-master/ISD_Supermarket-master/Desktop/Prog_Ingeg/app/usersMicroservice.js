@@ -167,7 +167,6 @@ router.get('/welcome', (req, res) => {
   });
 });
 
-// Modifica il microservizio
 router.get('/carrello', (req, res) => {
   const token = req.header('Authorization');
 
@@ -192,7 +191,6 @@ router.get('/carrello', (req, res) => {
       const userMessage = `Benvenuto nel carrello, ${userId || 'Visitatore'}!`;
       const productListHTML = generateProductListHTML(rows);
 
-      // Invia direttamente l'HTML come risposta
       const html = `
         <html>
           <head>
@@ -209,7 +207,6 @@ router.get('/carrello', (req, res) => {
   });
 });
 
-// Aggiungi la funzione per generare HTML dal risultato del database
 function generateProductListHTML(products) {
   let html = '<div id="cartContainer">';
 
