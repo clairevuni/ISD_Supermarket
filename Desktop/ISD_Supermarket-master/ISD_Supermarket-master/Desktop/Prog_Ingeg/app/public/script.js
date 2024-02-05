@@ -1,7 +1,6 @@
-// menu.js
+//duplicato di menu
 
 $(document).ready(function() {
-    // Array dei link del menu
     const menuItems = [
       { label: 'Chi siamo', link: '#' },
       { label: 'Cosa vendiamo', link: '#' },
@@ -9,7 +8,6 @@ $(document).ready(function() {
       { label: 'Loggati', link: '/login' }
     ];
   
-    // Genera dinamicamente i link del menu
     const menuElement = $('#menu');
     menuItems.forEach(item => {
       const linkElement = $('<a>').attr('href', item.link).text(item.label);

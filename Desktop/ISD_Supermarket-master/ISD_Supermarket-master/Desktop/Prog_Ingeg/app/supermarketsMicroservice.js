@@ -73,7 +73,7 @@ router.post('/register-supermarket', [
     dbSupermarkets.get(checkSupermarketQuery, [username], (err, existingSupermarket) => {
       if (err) {
         console.error(err);
-        return res.status(500).send('Internal Server Error');
+        return res.status(500).send('Internal Server Erroracci');
       } else if (existingSupermarket) {
         return res.status(400).send('Supermarket already exists');
       } else {
@@ -83,7 +83,7 @@ router.post('/register-supermarket', [
         dbSupermarkets.run(insertSupermarketQuery, [username, hash], insertErr => {
           if (insertErr) {
             console.error(insertErr);
-            return res.status(500).send('Internal Server Error');
+            return res.status(500).send('Internal Server Erroracci');
           } else {
             const redirectUrl = '/login-supermarket';
             res.status(200).json({ message: 'Registration successful', redirect: redirectUrl });
@@ -106,7 +106,7 @@ router.post('/login-supermarket', (req, res) => {
   dbSupermarkets.get(query, [username], (err, row) => {
     if (err) {
       console.error(err);
-      return res.status(500).send('Internal Server Error');
+      return res.status(500).send('Internal Server Errorpipo');
     }
 
     if (!row) {
@@ -140,7 +140,7 @@ router.get('/supermarket-welcome', (req, res) => {
     return res.status(401).send('Token mancante');
   }
 
-  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => {  // Rimuovi il "Bearer" dal token
+  jwt.verify(token.split(' ')[1], secretKey, (err, decoded) => { 
     if (err) {
       return res.status(401).send('Token non valido');
     }

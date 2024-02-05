@@ -11,16 +11,11 @@ const PORT = 4000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Forward requests to the respective microservices based on the endpoint
-
-// Users Microservice
+// route microservizio utenti
 app.use('/users', usersMicroservice);
 
-// Supermarkets Microservice
+// route microservizio supermercati
 app.use('/supermarkets', supermarketsMicroservice);
-
-// Products Microservice
-//app.use('/products', productsMicroservice);
 
 app.listen(PORT, () => {
   console.log(`API Gateway running at http://localhost:${PORT}/`);

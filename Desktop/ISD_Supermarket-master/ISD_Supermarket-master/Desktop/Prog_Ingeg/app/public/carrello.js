@@ -1,4 +1,4 @@
-// Recupera il carrello dal local storage
+// Recupera il carrello dal local storage->devo riguardare
 
 
 // Funzione per inserire dinamicamente gli elementi nella lista del carrello

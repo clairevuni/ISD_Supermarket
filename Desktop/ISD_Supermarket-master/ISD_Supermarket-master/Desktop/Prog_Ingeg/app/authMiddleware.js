@@ -1,4 +1,4 @@
-// authMiddleware.js
+// authMiddleware.js ->route di autenticazione
 
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
@@ -24,10 +24,8 @@ function verifyToken(req, res, next) {
 async function authenticateUser(req, res, next) {
   try {
     const { username } = req.user;
-    // Esegui una richiesta all'API per ottenere informazioni sull'utente
     const userResponse = await axios.get(`http://localhost:4000/users/getUserInfo/${username}`);
     
-    // Controlla ulteriori informazioni sull'utente se necessario
     if (userResponse.data && userResponse.data.role === 'user') {
       next();
     } else {
@@ -42,10 +40,8 @@ async function authenticateUser(req, res, next) {
 async function authenticateSupermarket(req, res, next) {
   try {
     const { username } = req.user;
-    // Esegui una richiesta all'API per ottenere informazioni sul supermercato
     const supermarketResponse = await axios.get(`http://localhost:4000/supermarkets/getSupermarketInfo/${username}`);
     
-    // Controlla ulteriori informazioni sul supermercato se necessario
     if (supermarketResponse.data && supermarketResponse.data.role === 'supermarket') {
       next();
     } else {
@@ -61,6 +57,5 @@ module.exports = {
   verifyToken,
   authenticateUser,
   authenticateSupermarket,
-  // Altri middleware se presenti
 };
 

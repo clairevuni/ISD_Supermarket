@@ -43,7 +43,6 @@ app.get('/lista_spesa', (req, res) => {
       return res.status(403).json({ error: 'Token non valido' });
     }
 
-    // Simuliamo una lista della spesa
     const listaSpesa = ['Pane', 'Latte', 'Frutta', 'Verdura'];
     res.json(listaSpesa);
   });
