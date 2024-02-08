@@ -1,11 +1,9 @@
 // Recupera il carrello dal local storage->devo riguardare
 
 
-// Funzione per inserire dinamicamente gli elementi nella lista del carrello
 /*function insertCartItems() {
   const cartContainer = document.getElementById('cartContainer');
 
-  // Popola la lista del carrello
   cart.forEach(item => {
     const cartItem = document.createElement('div');
     cartItem.classList.add('cart-item');
@@ -22,13 +20,11 @@
     const itemPrice = document.createElement('p');
     itemPrice.textContent = `Prezzo: ${item.price}`;
 
-    // Aggiungi gli elementi alla lista del carrello
     cartItem.appendChild(itemId);
     cartItem.appendChild(itemName);
     cartItem.appendChild(itemQuantity);
     cartItem.appendChild(itemPrice);
 
-    // Aggiungi l'elemento alla lista del carrello
     cartContainer.appendChild(cartItem);
   });
 
@@ -39,15 +35,14 @@ addToCartButtons.forEach(button => {
 
 
 
-  // Funzione per svuotare il carrello
   function emptyCart() {
-    // Rimuovi tutti gli elementi dal carrello
+
     cart.length = 0;
 
-    // Salva il carrello vuoto nel localStorage
+
     localStorage.setItem('cart', JSON.stringify(cart));
 
-    // Rimuovi gli elementi dal DOM
+ 
     const cartContainer = document.getElementById('cartContainer');
     while (cartContainer.firstChild) {
       cartContainer.removeChild(cartContainer.firstChild);
@@ -61,7 +56,7 @@ addToCartButtons.forEach(button => {
 
 }
 
-// Chiamata alla funzione per inserire gli elementi nel carrello
+
 insertCartItems();*/
 
 
