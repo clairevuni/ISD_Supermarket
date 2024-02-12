@@ -67,9 +67,9 @@ router.post('/login', (req, res) => {
       if (bcryptResult) {
         const userId = row.id;
         const username = req.body.username;
-        const token = jwt.sign({ userId }, secretKey, { expiresIn: '1h' });
-
-        res.status(200).json({ message: 'Login successful', redirect: '/welcome', token, username });
+        //const token = jwt.sign({ userId }, secretKey, { expiresIn: '1h' });
+        //console.log(token);
+        res.status(200).json({ message: 'Login successful', redirect: '/welcome', username });
       } else {
         res.status(401).send('Authentication Failed');
       }
@@ -331,9 +331,6 @@ function generateProductListHTML(products) {
 
 
 
-
-
-
 router.post('/aggiungi-al-carrello', (req, res)=>{
   const token = req.header('Authorization');
 
@@ -348,7 +345,7 @@ router.post('/aggiungi-al-carrello', (req, res)=>{
   const userId = decoded.username; 
   const productId = req.body.productId; 
   const productName = req.body.productName;
-  console.log(userId, "\n", productId, "\n", productName);
+  //console.log(userId, "\n", productId, "\n", productName);
 
     db.run('INSERT INTO user_cart (user_username, external_product_id, quantity, productName) VALUES (?, ?, 1, ?)', [userId, productId, productName], function(err) {
       if (err) {

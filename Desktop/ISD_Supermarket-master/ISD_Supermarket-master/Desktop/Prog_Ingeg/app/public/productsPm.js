@@ -76,7 +76,7 @@ function insertProducts(products, username) {
     card.appendChild(productId);
     card.appendChild(price);
     //card.appendChild(supermarketNameElement); 
-    card.appendChild(addToCartButton);
+    //card.appendChild(addToCartButton);
 
     
     productsContainer.appendChild(card);

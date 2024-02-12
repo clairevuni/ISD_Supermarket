@@ -134,9 +134,9 @@ router.post('/login-supermarket', (req, res) => {
 
       if (bcryptResult) {
         const username = req.body.username;
-        const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
+        //const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
 
-        res.status(200).json({ message: 'Login successful', redirect: '/supermarket-welcome', token, username });
+        res.status(200).json({ message: 'Login successful', redirect: '/supermarket-welcome', username });
       } else {
         res.status(401).send('Authentication Failed');
       }

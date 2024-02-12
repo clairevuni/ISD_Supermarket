@@ -75,9 +75,10 @@ app.post('/login', registrationLimiter, (req, res) => {
   axios.post('http://localhost:4000/users/login', { username, password })
     .then(response => {
       if (response.status === 200) {
-        const userId = response.data.userId;
+        //const userId = response.data.userId;
         const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
         // il token va nei cookie!!
+        //console.log(token);
         res.cookie('token', token, { httpOnly: false, secure: true });
         const redirectUrl = response.data.redirect;
         res.redirect(redirectUrl);
@@ -145,16 +146,7 @@ app.get('/logout', (req, res) => {
 res.redirect('/');
 });
 
-app.get('/menu', (req, res) => {
-  axios.get('http://localhost:4000/users/menu', req.body)
-    .then(response => {
-      res.status(response.status).send(response.data);
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).send('Ci viene da piangere');
-    });
-});
+
 
 app.get('/register', (req, res) => {
   res.sendFile(__dirname + '/HTML/register.html');
@@ -209,7 +201,7 @@ app.get('/carrello', authenticateToken, (req, res) => {
 
 function authenticateToken(req, res, next) {
   const token = req.cookies['token'];
-  console.log(token);
+  //console.log(token);
   if (!token) {
     return res.status(401).json({ error: 'Token mancante' });
   }
@@ -248,7 +240,7 @@ app.post('/aggiungi-al-carrello', authenticateToken, (req, res) => {
   const token = req.cookies['token'];
   const productId = req.body.productId;
   const productName = req.body.name;
-  console.log(productId, productName);
+  //console.log(productId, productName);
 
   axios.post(
     'http://localhost:4000/users/aggiungi-al-carrello',
@@ -405,7 +397,7 @@ app.get('/register-supermarket', (req, res) => {
 app.post('/save-product', async (req, res) => {
   try {
     const username = req.query.username;
-    console.log(username);
+    //console.log(username);
     const { productName, productCategory, productPrice, productDescription } = req.body;
 
     const productsMicroserviceEndpoint = 'http://localhost:4000/supermarkets/save-product';
@@ -420,7 +412,7 @@ app.post('/save-product', async (req, res) => {
       
       const userId = response.data.userId; 
       const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
-      console.log(token);
+      //console.log(token);
       res.cookie('token', token, { httpOnly: false, secure: true }); 
       const redirectUrl = response.data.redirect;
       res.redirect(redirectUrl);
